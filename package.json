@@ -8,7 +8,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "check": "node --check server.js && node --check lib/store.js && node --check lib/mailer.js && node --check lib/render.js && node --check lib/seo.js && node --check public/js/main.js && node --check admin/js/admin.js"
+    "check": "node --check server.js && node --check lib/store.js && node --check lib/mailer.js && node --check lib/render.js && node --check lib/seo.js && node --check public/js/main.js && node --check admin/js/admin.js && node --check tests/admin-env.test.js",
+    "test:unit": "node tests/mailer.test.js && node tests/store.test.js && node tests/admin-env.test.js"
   },
   "engines": {
     "node": ">=18"

@@ -18,7 +18,7 @@
 | --- | --- | --- | --- | --- |
 | 0 | 无 | 填一张公司信息表 | ~~见下方模板~~ | ✅ 已完成 2026-11-11 |
 | 1 | GitHub | 建**私有**仓库 + 提供地址 | ~~仓库地址~~ | ✅ 已完成 2026-11-11 |
-| 2 | Resend | ~~建 API Key + 回我注册邮箱 / 方式~~ | — | ✅ 已完成 2026-11-11 |
+| 2 | Resend | ~~建 API Key + 回我注册邮箱 / 方式~~ | — | ✅ 已完成，2A 定案 |
 | 3 | Render | 导入蓝图 + 粘贴 3 个值 | 源站地址 | ✅ **现在从这里开始** |
 | 4 | 阿里云 | 买域名 | 域名 | ⏸ 最后 |
 | 5 | Cloudflare | 改 NS + 加我给的记录 | NS 已改 | ⏸ 最后 |
@@ -62,7 +62,7 @@ Organization JSON-LD、`llms.txt` 与 `llms-full.txt`。
 - 新增 2 条公司事实 FAQ（资质、装机业绩），Organization JSON-LD 补上 `foundingDate`、
   完整的 `PostalAddress`（城市/省份/国家）和 `hasCredential` 证书数组。
 
-**验证结果**：端到端 152 项 + 邮件 14 项 + 持久卷 5 项 = **171 项全通过**；
+**验证结果**：端到端 152 项 + 邮件 14 项 + 持久卷 5 项 + 管理员密码环境变量 3 项 = **174 项全通过**；
 `launch/acceptance.sh` 本地 **49 PASS / 0 FAIL / 2 SKIP**（2 项 SKIP 只在正式 https 域名下才检查）。
 
 **仍可补、但不阻塞上线**：真实产品型号与实拍图、1200×630 PNG 分享图、证书编号/扫描件、
@@ -137,6 +137,10 @@ TXT 细节见 `launch/deploy-values.md` B 段（含「SPF 只能有一条、必�
 
 **完成标志已达成**：发件人确定为 `onboarding@resend.dev`，Key 安全落地且发信链路实测成功。
 
+> ✅ **用户已确认（2026-11-11）：按 2A 继续，不再切换 2B。**
+> `info@hanxvonfluid.cn` 保持为前端客户看到的联系邮箱（页脚 / 联系页 / 结构化数据都不变），
+> 询盘通知邮件投递到 `lukman13929924907@gmail.com`。上面 2B 步骤仅作为将来可选的升级路径保留。
+
 ---
 
 ## 回合 3｜Render 部署（约 8 分钟）← **现在从这里开始，做完网站就上线了**
@@ -149,7 +153,7 @@ TXT 细节见 `launch/deploy-values.md` B 段（含「SPF 只能有一条、必�
 
    | 变量 | 精确值（可直接照抄） |
    | --- | --- |
-   | `ADMIN_PASSWORD` | `launch/local-secrets.txt` 里的 19 位强密码（也是正式站后台登录密码） |
+   | `ADMIN_PASSWORD` | `launch/local-secrets.txt` 里的 19 位强密码（正式站后台登录密码；2026-11-11 修复后**真正生效**） |
    | `EMAIL_API_KEY` | `launch/local-secrets.txt` 里的 `re_...`（已实测可用） |
    | `EMAIL_FROM` | `onboarding@resend.dev` ← 方式 2A 的最终确定值 |
 
@@ -254,5 +258,5 @@ bash launch/acceptance.sh http://127.0.0.1:3211  # 本地自检
 - `README.md`：后台各面板、环境变量、邮件通知说明
 - `SEO-GEO.md`：关键词地图、AI 引用监测、内容计划
 - `render.yaml`：托管部署蓝图；`Dockerfile`：换平台时用
-- `tests/`：152 项端到端 + 14 项邮件 + 5 项持久卷回归测试（共 171 项）
+- `tests/`：152 项端到端 + 14 项邮件 + 5 项持久卷 + 3 项管理员密码环境变量回归（共 174 项）
 - 已内置的英语区合规：`/privacy` 隐私政策页、Cookie 同意横幅、Consent Mode v2、安全响应头（见 `launch/deploy-values.md` H 段）

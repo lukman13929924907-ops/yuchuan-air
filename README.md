@@ -41,12 +41,17 @@ node server.js
 | --- | --- |
 | 后台地址 | `/admin` |
 | 用户名 | `admin` |
-| 初始密码 | `Ycefddc22af0!` |
+| 本地 / 预览站初始密码 | `Ycefddc22af0!` |
+| 正式站密码 | 部署时设置的 `ADMIN_PASSWORD` 环境变量 |
 
-> **上线第一件事：进入 后台 → Backup & Security → Change admin password 修改密码。**
-> 密码以 scrypt 加盐哈希存在 `config.json`，不会以明文保存。
-> 若把 `config.json` 里的 `passwordHash` 和 `salt` 清空，下次启动会重新初始化：
-> 可用环境变量 `ADMIN_PASSWORD` 指定初始密码，否则回退到默认 `Yuchuan@2026`。
+> **生产必填 `ADMIN_PASSWORD`。** 只要设置了它，就会覆盖 `config.json` 里的哈希，
+> 成为唯一有效的后台密码；上面这个公开在文档里的初始密码会自动失效。
+> （2026-11-11 修复：此前环境变量只在首次启动生效，正式站仍能被初始密码登录。）
+> 本机不设该变量时，用 `config.json` 的哈希（`Ycefddc22af0!`）登录。
+> 密码以 scrypt 加盐哈希存储，不保存明文；也可在 后台 → Backup & Security →
+> Change admin password 修改，但**生产以环境变量为准**（重启后仍以它为准）。
+> 只有清空 `config.json` 的 `passwordHash` / `salt` 且**不设** `ADMIN_PASSWORD` 时，
+> 才会用默认 `Yuchuan@2026` 重新初始化。
 
 ## 后台能改什么
 
@@ -168,7 +173,7 @@ node tests/store.test.js
 | `PORT` | 监听端口 | `3000` |
 | `HOST` | 绑定地址 | `0.0.0.0` |
 | `ADMIN_USERNAME` | 管理员用户名 | `admin` |
-| `ADMIN_PASSWORD` | 首次启动时使用的初始密码 | `Yuchuan@2026` |
+| `ADMIN_PASSWORD` | **管理员密码，始终覆盖 `config.json` 的哈希**；生产必填（见「管理员账号」） | 未设置时用 `config.json` 的哈希 |
 | `DATA_DIR` | 数据目录；**托管平台务必指向项目外的持久卷**（如 `/var/lib/yuchuan`），不要挂到项目内 `data/`，否则种子文件会被卷遮蔽 | `./data` |
 | `FORCE_HTTPS` | 设为 `1`，在 Cloudflare 等反向代理后给 Cookie 加 `Secure` | 关闭 |
 | `EMAIL_PROVIDER` / `EMAIL_API_KEY` / `EMAIL_FROM` / `EMAIL_TO` | 询盘邮件通知，见上一节 | 关闭 |

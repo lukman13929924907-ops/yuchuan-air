@@ -178,9 +178,11 @@ sudo ufw enable
 
 ## 6. 上线后的后台配置（重要）
 
-访问 `https://yourdomain.com/admin`，用 `admin` 登录（初始密码见 README.md）。
+访问 `https://yourdomain.com/admin`，用 `admin` + 部署时设置的 `ADMIN_PASSWORD` 登录
+（环境变量会覆盖 `config.json` 的哈希，README 里的初始密码在正式站不可用）。
 
-- [ ] **Backup & Security → Change admin password**：立即改掉初始密码
+- [ ] **确认后台登录**：强密码可登录、README 的初始密码应被拒绝（401）。
+      生产环境换密码请改平台的 `ADMIN_PASSWORD` 变量，不要在后台改（重启会被环境变量覆盖）
 - [ ] **Site Settings → Canonical Site URL**：填 `https://yourdomain.com`（影响 canonical 与 sitemap.xml）
 - [x] **Site Settings**：真实电话、WhatsApp、地址、工作时间、2018 成立、35+ 国家、1,900+ 台套、真实资质已填好（2026-11-11）；只需核对一遍
 - [ ] **Products / Articles**：替换示例产品为真实型号，上传实拍图；不需要的示例内容可删除
@@ -605,7 +607,7 @@ done
 1. 把项目推到 GitHub / GitLab，根目录已包含 `render.yaml`。
 2. Render → New → Blueprint → 选仓库。会自动创建一个 Web Service 和一块 1 GB 持久盘，挂载到 `/var/lib/yuchuan`。
 3. 在 Render 控制台填好三个标了 `sync: false` 的变量（**不要写进仓库**）：
-   - `ADMIN_PASSWORD`：强随机密码，仅首次启动生效
+   - `ADMIN_PASSWORD`：强随机密码，**始终覆盖 `config.json` 的哈希**，是正式站唯一有效的后台密码（2026-11-11 修复；旧版本仅首次启动生效，会让文档里的初始密码继续可用）
    - `EMAIL_API_KEY`：Resend 的 `re_...`
    - `EMAIL_FROM`：测试期用 `onboarding@resend.dev`，正式域名验证后换成 `Yuchuan Air <noreply@yourdomain.com>`
 4. `region` 建议 `oregon`（英语区美西）或 `frankfurt`（欧洲）；`render.yaml` 默认 `oregon`。

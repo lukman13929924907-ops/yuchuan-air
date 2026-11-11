@@ -12,7 +12,8 @@
  *   PORT            HTTP port                     (default 3000)
  *   HOST            bind address                  (default 0.0.0.0)
  *   ADMIN_USERNAME  admin login name              (default admin)
- *   ADMIN_PASSWORD  initial password, used ONLY on first boot
+ *   ADMIN_PASSWORD  admin password; ALWAYS overrides config.json (set this in prod)
+ *                   when unset: used to initialise config.json on first boot
  *   DATA_DIR        move data/ to another volume  (default ./data)
  *   FORCE_HTTPS     set to 1 to mark cookies Secure behind a proxy
  *   EMAIL_PROVIDER  resend | postmark | custom    (inquiry email)
@@ -68,6 +69,17 @@ function loadConfig() {
   cfg.port = Number(process.env.PORT || cfg.port) || 3000;
   cfg.host = process.env.HOST || cfg.host;
   if (process.env.ADMIN_USERNAME) cfg.admin.username = process.env.ADMIN_USERNAME;
+
+  // Managed platforms inject the admin password as an env var (see render.yaml).
+  // It MUST override the hash committed in config.json, otherwise the documented
+  // default password stays valid on the production site no matter what the
+  // operator typed into the dashboard. Recompute in memory only: never persist
+  // the production secret into the image / repository.
+  if (process.env.ADMIN_PASSWORD) {
+    const salt = cfg.admin.salt || crypto.randomBytes(16).toString('hex');
+    cfg.admin.salt = salt;
+    cfg.admin.passwordHash = crypto.scryptSync(String(process.env.ADMIN_PASSWORD), salt, 64).toString('hex');
+  }
 
   if (!cfg.admin.passwordHash || !cfg.admin.salt) {
     const salt = crypto.randomBytes(16).toString('hex');

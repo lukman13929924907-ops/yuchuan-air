@@ -28,7 +28,9 @@
 
 ## B. Resend 发件域验证（推荐方式 2B，不需要等新域名）
 
-> **当前状态（2026-11-11）：已按方式 2A 配置并实测发信成功。**
+> **当前状态（2026-11-11）：方式 2A 已定案（用户确认不再切换），发信实测成功。**
+> `info@hanxvonfluid.cn` 仅作前端展示邮箱，询盘通知发到 `lukman13929924907@gmail.com`。
+> 本段 2B 仅作将来可选的升级路径保留。
 > 注册邮箱是 `lukman13929924907@gmail.com`，因此 Resend 测试发件人
 > `onboarding@resend.dev` **只能发到该 Gmail**；发往 `info@hanxvonfluid.cn` 实测返回
 > `403 validation_error`。2A 阶段询盘到 Gmail（同时存进后台 Inquiries，不会丢），
