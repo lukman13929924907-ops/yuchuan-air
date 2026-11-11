@@ -1,0 +1,18 @@
+node_modules/
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+
+# 导入前自动生成的回滚副本，属于运行时产物
+data/db.backup.json
+
+# 上传图片是运行时数据；保留目录占位文件即可
+data/uploads/*
+!data/uploads/README.txt
+
+# 说明：data/db.json 与 config.json 故意不忽略 —— 它们是整站迁移时必须一起复制的内容。
+# 若把项目放进公开仓库，请在部署时通过其它方式注入 config.json，避免泄露密码哈希。
+
+# 本地部署凭据（含明文管理员密码），绝不入库
+launch/local-secrets.txt

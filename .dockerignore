@@ -1,0 +1,8 @@
+.git
+.workbuddy
+node_modules
+tests
+*.md
+data/uploads/*
+!data/uploads/README.txt
+data/db.backup.json

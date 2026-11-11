@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Website Admin | Shandong Yuchuan</title>
+  <link rel="icon" href="/img/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/admin/css/admin.css">
+  <script src="/admin/js/admin.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <!-- Sign-in -->
+  <div id="login-view" class="login-view" hidden>
+    <form class="login-card" id="login-form">
+      <div class="login-logo">
+        <svg viewBox="0 0 48 48" width="46" height="46" aria-hidden="true">
+          <rect x="2" y="2" width="44" height="44" rx="9" fill="#0d2436"/>
+          <g fill="#f26522">
+            <path d="M24 9 c5 3 6 9 3 14 c-2 3 -1 6 0 8 c-6 -1 -10 -6 -9 -12 c1 -5 3 -8 6 -10 z"/>
+            <path d="M39 21 c-3 5 -9 7 -14 4 c-3 -2 -6 -1 -8 0 c1 -6 5 -11 12 -12 c5 -1 8 1 10 8 z" opacity=".85"/>
+            <path d="M27 40 c-5 -3 -7 -9 -4 -14 c2 -3 1 -6 0 -8 c6 1 10 6 9 12 c-1 5 -3 8 -5 10 z" opacity=".7"/>
+          </g><circle cx="24" cy="24" r="4" fill="#fff"/>
+        </svg>
+      </div>
+      <h1>Website Admin</h1>
+      <p class="login-sub">Manage products, articles and site settings.</p>
+      <div class="form-field">
+        <label for="login-username">Username</label>
+        <input id="login-username" name="username" type="text" autocomplete="username" required>
+      </div>
+      <div class="form-field">
+        <label for="login-password">Password</label>
+        <input id="login-password" name="password" type="password" autocomplete="current-password" required>
+      </div>
+      <button class="btn btn-primary" type="submit" id="login-submit">Sign In</button>
+      <p class="form-status" id="login-status" role="status" aria-live="polite"></p>
+      <a class="login-back" href="/">← Back to website</a>
+    </form>
+  </div>
+
+  <!-- Application -->
+  <div id="app-view" class="app" hidden>
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <span class="sidebar-mark">YC</span>
+        <span><strong>Yuchuan Air</strong><small>Website Admin</small></span>
+      </div>
+      <nav class="side-nav" aria-label="Admin navigation">
+        <button type="button" data-panel="dashboard" class="is-active">Dashboard</button>
+        <button type="button" data-panel="products">Products</button>
+        <button type="button" data-panel="categories">Categories</button>
+        <button type="button" data-panel="posts">Articles</button>
+        <button type="button" data-panel="applications">Applications</button>
+        <button type="button" data-panel="faqs">FAQ / GEO</button>
+        <button type="button" data-panel="inquiries">Inquiries <span class="badge" id="unread-badge" hidden>0</span></button>
+        <button type="button" data-panel="settings">Site Settings</button>
+        <button type="button" data-panel="backup">Backup &amp; Security</button>
+      </nav>
+      <div class="sidebar-foot">
+        <a href="/" target="_blank" rel="noopener">View Website ↗</a>
+        <button type="button" id="logout-btn">Sign Out</button>
+      </div>
+    </aside>
+
+    <div class="app-main">
+      <header class="app-topbar">
+        <h1 id="panel-title">Dashboard</h1>
+        <div class="topbar-actions">
+          <span class="admin-name" id="admin-name"></span>
+          <a class="btn btn-outline-dark btn-small" href="/" target="_blank" rel="noopener">View Site ↗</a>
+          <button class="btn btn-small btn-ghost" type="button" id="logout-btn-2">Sign Out</button>
+        </div>
+      </header>
+      <main id="main" class="panel" tabindex="-1"></main>
+    </div>
+  </div>
+
+  <!-- Edit dialog -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-head">
+        <h2 id="modal-title">Edit</h2>
+        <button type="button" class="icon-btn" data-close aria-label="Close dialog">×</button>
+      </div>
+      <form id="entity-form">
+        <div class="modal-body" id="modal-fields"></div>
+        <div class="modal-foot">
+          <button type="button" class="btn btn-ghost" data-close>Cancel</button>
+          <button type="submit" class="btn btn-primary" id="modal-save">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

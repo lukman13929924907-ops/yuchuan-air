@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-label="Shandong Yuchuan industrial air filtration equipment">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d2436"/>
+      <stop offset="1" stop-color="#123b52"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <g opacity=".12" stroke="#ffffff" stroke-width="2" fill="none">
+    <path d="M0 120 H1200 M0 240 H1200 M0 360 H1200 M0 480 H1200"/>
+    <path d="M120 0 V630 M360 0 V630 M600 0 V630 M840 0 V630 M1080 0 V630"/>
+  </g>
+  <rect x="72" y="72" width="14" height="150" fill="#f26522"/>
+  <g transform="translate(112,72)">
+    <rect width="76" height="76" rx="14" fill="#f26522"/>
+    <path d="M20 54 L38 24 L56 54 M28 43 H48" fill="none" stroke="#ffffff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <text x="112" y="215" fill="#ffffff" font-family="Arial,Helvetica,sans-serif" font-size="52" font-weight="700" letter-spacing="1">Shandong Yuchuan</text>
+  <text x="112" y="270" fill="#ffb98d" font-family="Arial,Helvetica,sans-serif" font-size="27" font-weight="600" letter-spacing="2">INDUSTRIAL AIR FILTRATION &amp; DUST COLLECTION</text>
+  <line x1="112" y1="310" x2="1088" y2="310" stroke="#f26522" stroke-width="4"/>
+  <text x="112" y="382" fill="#dbe7ed" font-family="Arial,Helvetica,sans-serif" font-size="29">Welding fume extractors  ·  Cartridge &amp; wet dust collectors</text>
+  <text x="112" y="430" fill="#dbe7ed" font-family="Arial,Helvetica,sans-serif" font-size="29">Downdraft tables  ·  Extraction arms  ·  Oil mist &amp; VOC systems</text>
+  <text x="112" y="530" fill="#ffffff" font-family="Arial,Helvetica,sans-serif" font-size="24" opacity=".85">Engineered for global manufacturers  |  Ships worldwide</text>
+  <g fill="none" stroke="#f26522" stroke-width="7" stroke-linecap="round" opacity=".35">
+    <path d="M930 500 h150 M990 440 l60 60 M960 560 h120"/>
+  </g>
+</svg>

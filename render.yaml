@@ -1,0 +1,39 @@
+# Render Blueprint - one-click deploy for the "Cloudflare + managed Node" path.
+# Docs: https://render.com/docs/blueprint-spec
+#
+# IMPORTANT: the persistent volume is mounted at /var/lib/yuchuan, NOT at the
+# project's ./data folder. The bundled ./data/db.json stays inside the app and
+# is used to seed an empty volume on first boot (see lib/store.js).
+# Fill ADMIN_PASSWORD / EMAIL_API_KEY / EMAIL_FROM in the Render dashboard
+# (marked sync: false) - never commit secrets into this file.
+
+services:
+  - type: web
+    name: yuchuan-air
+    runtime: node
+    plan: starter
+    region: oregon
+    buildCommand: npm install --ignore-scripts
+    startCommand: node server.js
+    healthCheckPath: /api/site
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: DATA_DIR
+        value: /var/lib/yuchuan
+      - key: FORCE_HTTPS
+        value: "1"
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: EMAIL_PROVIDER
+        value: resend
+      - key: EMAIL_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      - key: EMAIL_TO
+        value: info@hanxvonfluid.cn
+    disk:
+      name: yuchuan-data
+      mountPath: /var/lib/yuchuan
+      sizeGB: 1

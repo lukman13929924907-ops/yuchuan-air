@@ -1,0 +1,18 @@
+{
+  "port": 3000,
+  "host": "0.0.0.0",
+  "sessionHours": 24,
+  "maxUploadMB": 6,
+  "admin": {
+    "username": "admin",
+    "passwordHash": "f445e10bf31179a7573748edce6df7b2c48b49b50ac0bd781a19a472c44d154b5d8da73c53ff231a3c7a346a10d23c3a72df5ee15a743c4c5b77e385db1fc6ed",
+    "salt": "f95df7c252e13ee094a0274e8f081851"
+  },
+  "email": {
+    "provider": "",
+    "apiKey": "",
+    "from": "",
+    "to": "info@hanxvonfluid.cn",
+    "endpoint": ""
+  }
+}
