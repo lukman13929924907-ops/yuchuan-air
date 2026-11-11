@@ -7,19 +7,19 @@
 
 ## 先看结论
 
-网站**代码与部署配置已经 100% 就绪**，本地 git 仓库也已建好（39 个文件，首次提交完成）。
-现在缺的不是开发，而是 3 次平台登录授权。
+网站**代码与部署配置已经 100% 就绪**，本地 git 仓库已建好并已推送到 GitHub 私有仓库
+（39 个文件，`d7b692d`）。现在缺的不是开发，而是剩下 2 次平台登录授权（Resend、Render）。
 
-**做完回合 1–3，网站就已经在公网正式运行、能收询盘邮件了** —— 只是网址还是
+**做完回合 2–3，网站就已经在公网正式运行、能收询盘邮件了** —— 只是网址还是
 `xxx.onrender.com`。域名（你说的"最后绑定"）只是最后换门牌，不需要重做网站，
 `Canonical Site URL` 在后台改一次，全站 canonical / sitemap / llms.txt / JSON-LD 会自动跟着变。
 
 | 回合 | 需要登录的平台 | 你要做的动作 | 回我一句 | 能否现在做 |
 | --- | --- | --- | --- | --- |
 | 0 | 无 | 填一张公司信息表 | ~~见下方模板~~ | ✅ 已完成 2026-11-11 |
-| 1 | GitHub | 建**私有**仓库 + 浏览器授权一次 | 仓库地址 | ✅ 立刻 |
+| 1 | GitHub | 建**私有**仓库 + 提供地址 | ~~仓库地址~~ | ✅ 已完成 2026-11-11 |
 | 2 | Resend | 建一个 API Key（Key 不用发我） | 注册邮箱 + 发件方式 | ✅ 立刻 |
-| 3 | Render | 导入蓝图 + 粘贴 3 个值 | 源站地址 | ✅ 立刻 |
+| 3 | Render | 导入蓝图 + 粘贴 3 个值 | 源站地址 | ✅ 立刻（回合 2 之后） |
 | 4 | 阿里云 | 买域名 | 域名 | ⏸ 最后 |
 | 5 | Cloudflare | 改 NS + 加我给的记录 | NS 已改 | ⏸ 最后 |
 | 6 | Google / Bing | 站长验证授权 | 验证完成 | ⏸ 最后 |
@@ -73,28 +73,24 @@ LinkedIn 公司主页 URL。这些随时可以在后台补，不影响回合 1�
 
 ---
 
-## 回合 1｜GitHub 私有仓库（约 3 分钟）← **现在从这里开始**
+## 回合 1｜GitHub 私有仓库 ✅ 已完成（2026-11-11）
 
-**你要做的**：
+- 仓库：`https://github.com/lukman13929924907-ops/yuchuan-air.git`（Private）
+- 已推送 **39 个文件**、分支 `master`、提交 `d7b692d`；`git ls-remote origin HEAD` 与本地 HEAD 完全一致。
+- 安全检查：`launch/local-secrets.txt`、`data/db.backup.json`、`data/uploads/*` 均未被跟踪；
+  `config.json` 中的管理密码哈希只存在于私有仓库，未进公开预览。
+- 小插曲：本机凭据管理器缓存的是另一个 GitHub 账号 `lukmanliu930805-netizen`，首次 push
+  返回 `403 Permission ... denied`。处理方式是把凭据隔离到**本仓库的本地配置**
+  （`git config --local credential.namespace yuchuan-air-github` + remote URL 带仓库所属用户名），
+  重新 push 即成功；**没有删除或改动全局 GitHub 凭据**，其他仓库不受影响。
+- 在线预览已按你的授权重新发布（覆盖原链接）：首页、`/llms.txt`、`/api/site` 均返回 200，
+  真实电话 / WhatsApp / 地址 / 2018 / 35+ / 1,900+ / 资质全部可见，无残留占位。
 
-1. 登录 GitHub → 右上角 `+` → **New repository**
-2. 仓库名填 `yuchuan-air`，选 **Private**（重要：`config.json` 含管理密码哈希，不要公开）
-3. **不要**勾选 README / .gitignore / license 任何初始化选项 → 点 **Create repository**
-4. 复制页面上的仓库地址（`https://github.com/<你的账号>/yuchuan-air.git`）
-
-**回我一句**：`回合1完成：https://github.com/xxx/yuchuan-air.git`
-
-**我接着做**：配置 remote 并执行 push。
-**这时会弹出浏览器让你登录 GitHub 并点一次 Authorize —— 这一步就是你说的「授权」，点完就不用管了。**
-
-**完成标志**：GitHub 仓库里出现 39 个文件，根目录能看到 `render.yaml`。
-> 如果没弹浏览器而是报权限错，最省事的办法：装 **GitHub Desktop** 登录 →
-> `File → Add Local Repository` → 选 `E:\国内\workbody\2026-11-08-09-03-25\yuchuan-air`
-> → 点 `Publish repository`。全程鼠标，不用命令行。
+**完成标志已达成**：私有仓库根目录能看到 `render.yaml`，39 个文件齐全。
 
 ---
 
-## 回合 2｜Resend 发信通道（约 5 分钟）
+## 回合 2｜Resend 发信通道（约 5 分钟）← **现在从这里开始**
 
 邮箱地址 ≠ 发信通道。`info@hanxvonfluid.cn` 是**收件**地址，网站要自动发信还需要一个发件服务。
 
