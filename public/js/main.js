@@ -427,7 +427,9 @@
       '</ul></div></div>' +
       '<div class="footer-bottom"><span>© ' + new Date().getFullYear() + ' ' +
       esc(s.companyName || '') + '. All rights reserved.</span>' +
-      '<span>' + esc(s.certifications || '') + ' &nbsp;|&nbsp; <a href="/sitemap.xml">Sitemap</a></span>' +
+      '<span>' + esc(s.certifications || '') + ' &nbsp;|&nbsp; <a href="/sitemap.xml">Sitemap</a>' +
+      ' &nbsp;|&nbsp; <a href="/privacy">Privacy Policy</a>' +
+      ' &nbsp;|&nbsp; <a href="#cookies" data-yc-consent>Cookie settings</a></span>' +
       '</div></div></footer>';
 
     var host = $('#site-footer');

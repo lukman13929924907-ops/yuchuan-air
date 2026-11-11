@@ -4,7 +4,9 @@
 **Shandong Yuchuan Environmental Protection and Energy Saving Technology Co., Ltd.**
 
 > **准备正式上线？按 [LAUNCH-STEPS.md](./LAUNCH-STEPS.md) 一回合一步操作**（只需登录 / 授权 / 粘贴，其余配置与脚本已备好）。
-> 一键验收：`bash launch/acceptance.sh https://你的域名`。技术参考再看 [DEPLOY.md](./DEPLOY.md) 第 16 节。
+> 可复制的 DNS / WAF / SSL 配置在 [launch/deploy-values.md](./launch/deploy-values.md)；
+> 一键验收 `bash launch/acceptance.sh https://你的域名`；技术参考看 [DEPLOY.md](./DEPLOY.md) 第 16 节。
+> 英语区合规已内置：`/privacy` 政策页、Cookie 同意、Consent Mode v2、安全响应头。
 
 ## 为什么这样设计
 

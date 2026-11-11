@@ -100,7 +100,33 @@ case "$D" in
 esac
 
 echo
-echo '--- 8. Reminders (informational) ---'
+echo '--- 8. Privacy, consent & security headers ---'
+PRIV=$(curl -s --max-time 20 "$D/privacy")
+case "$PRIV" in *'data-ssr="1"'*) ck 'privacy page server-rendered' 1;; *) ck 'privacy page server-rendered' 0;; esac
+case "$PRIV" in *'<h1>Privacy Policy</h1>'*) ck 'privacy page H1 in raw HTML' 1;; *) ck 'privacy page H1 in raw HTML' 0;; esac
+case "$PRIV" in *'info@hanxvonfluid.cn'*) ck 'privacy page uses real mailbox' 1;; *) ck 'privacy page uses real mailbox' 0;; esac
+case "$PRIV" in *'data-yc-consent'*) ck 'footer cookie settings link' 1;; *) ck 'footer cookie settings link' 0;; esac
+case "$(curl -s --max-time 20 "$D/contact")" in *'href="/privacy"'*) ck 'contact form privacy notice' 1;; *) ck 'contact form privacy notice' 0;; esac
+c=$(code "$D/js/consent.js"); [ "$c" = "200" ] && ck "consent.js served ($c)" 1 || ck "consent.js served ($c)" 0
+HDRS=$(curl -s -D - -o /dev/null --max-time 20 "$D/")
+if printf '%s' "$HDRS" | grep -qi 'permissions-policy:.*camera=()'; then
+  ck 'Permissions-Policy header' 1
+else
+  ck 'Permissions-Policy header' 0
+fi
+case "$D" in
+  https://*)
+    if printf '%s' "$HDRS" | grep -qi 'strict-transport-security:'; then
+      ck 'HSTS header over HTTPS' 1
+    else
+      ck 'HSTS header over HTTPS (check FORCE_HTTPS / X-Forwarded-Proto)' 0
+    fi
+    ;;
+  *) sk 'HSTS check (only for the live https domain)';;
+esac
+
+echo
+echo '--- 9. Reminders (informational) ---'
 HOME_HTML=$(curl -s --max-time 20 "$D/")
 case "$HOME_HTML" in *'8899 0666'*) echo 'NOTE  placeholder phone +86 531 8899 0666 is still on the site (round 0)';;
   *) echo 'NOTE  placeholder phone replaced'; esac

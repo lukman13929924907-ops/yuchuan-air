@@ -259,6 +259,65 @@ function typesOf(ld) {
   await call('PUT', '/api/admin/settings', settingsBefore, cookie);
   ck('settings restored', (await call('GET', '/')).b.indexOf('G-QA1234567') === -1);
 
+  console.log('\n=== Privacy / cookie consent (EEA-UK compliance) ===');
+  const privacyResp = await call('GET', '/privacy');
+  const privacyHtml = privacyResp.b;
+  ck('privacy page is server-rendered', privacyResp.s === 200 &&
+    privacyHtml.indexOf('data-ssr="1"') > -1 &&
+    privacyHtml.indexOf('<h1>Privacy Policy</h1>') > -1, 'status ' + privacyResp.s);
+  ck('privacy page has absolute canonical',
+    /<link rel="canonical" href="https?:\/\/[^"]*\/privacy">/.test(privacyHtml));
+  ck('privacy page uses the real company email',
+    privacyHtml.indexOf('info@hanxvonfluid.cn') > -1);
+  ck('footer has privacy + cookie settings links',
+    privacyHtml.indexOf('href="/privacy"') > -1 && privacyHtml.indexOf('data-yc-consent') > -1);
+  ck('privacy page listed in sitemap.xml',
+    (await call('GET', '/sitemap.xml')).b.indexOf('/privacy</loc>') > -1);
+  ck('privacy page listed in llms.txt',
+    (await call('GET', '/llms.txt')).b.indexOf('/privacy') > -1);
+  ck('contact form links the privacy notice',
+    (await call('GET', '/contact')).b.indexOf('href="/privacy"') > -1);
+  const consentJs = (await call('GET', '/js/consent.js')).b;
+  ck('consent.js is served and can withdraw consent',
+    consentJs.indexOf('yc_consent_granted') > -1 &&
+    consentJs.indexOf('loadOptionalTags') > -1 &&
+    consentJs.indexOf('YC_CONSENT') > -1);
+  const homeResp = await call('GET', '/');
+  ck('Permissions-Policy header present',
+    String(homeResp.h['permissions-policy'] || '').indexOf('camera=()') > -1);
+
+  const consentSave = await call('PUT', '/api/admin/settings',
+    Object.assign({}, settingsBefore, {
+      gaMeasurementId: 'G-QA1234567',
+      metaPixelId: '123456789012345',
+      linkedinPartnerId: '987654',
+      cookieConsentEnabled: true
+    }), cookie);
+  ck('consent settings saved from admin', consentSave.s === 200);
+  const gated = (await call('GET', '/')).b;
+  ck('Consent Mode v2 defaults to denied',
+    gated.indexOf('"analytics_storage":"denied"') > -1 &&
+    gated.indexOf('"ad_user_data":"denied"') > -1 &&
+    gated.indexOf('"wait_for_update":500') > -1);
+  ck('consent default runs BEFORE the GA4 tag',
+    gated.indexOf('"analytics_storage":"denied"') < gated.indexOf('G-QA1234567'));
+  ck('Meta Pixel is NOT emitted before consent', gated.indexOf('connect.facebook.net') === -1);
+  ck('LinkedIn tag is NOT emitted before consent', gated.indexOf('snap.licdn.com') === -1);
+  ck('deferred vendor IDs handed to consent.js',
+    gated.indexOf('"meta":"123456789012345"') > -1 &&
+    gated.indexOf('"linkedin":"987654"') > -1);
+  ck('consent.js loaded on page', gated.indexOf('/js/consent.js') > -1);
+  await call('PUT', '/api/admin/settings',
+    Object.assign({}, settingsBefore, {
+      gaMeasurementId: 'G-QA1234567', cookieConsentEnabled: false
+    }), cookie);
+  const ungated = (await call('GET', '/')).b;
+  ck('consent gate is admin-configurable',
+    ungated.indexOf('"analytics_storage":"denied"') === -1 &&
+    ungated.indexOf('G-QA1234567') > -1);
+  await call('PUT', '/api/admin/settings', settingsBefore, cookie);
+  ck('consent settings restored', (await call('GET', '/')).b.indexOf('G-QA1234567') === -1);
+
   if (leadRow) {
     ck('cleanup test lead', (await call('DELETE', '/api/admin/inquiries/' + leadRow.id, undefined, cookie)).s === 200);
   }

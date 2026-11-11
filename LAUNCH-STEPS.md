@@ -171,7 +171,7 @@ WhatsApp：
 
 **回我一句**：`回合5完成：NS 已改`
 
-**我接着做**：给你一张可直接照抄的记录表（@ / www CNAME 指向源站、Resend 的 DKIM/SPF/DMARC TXT）。
+**我接着做**：把 **`launch/deploy-values.md`** 里的 `YOUR_DOMAIN` / `ORIGIN_HOST` 全部换成你的真实值再给你。该文件已预置好完整记录表（@ / www CNAME、Resend DKIM/SPF/DMARC TXT、GSC/Bing 验证 TXT）、WAF 放行表达式、SSL 设置与验收命令，你照抄即可。
 
 **你要做的（续）**：
 
@@ -218,8 +218,10 @@ bash launch/acceptance.sh http://127.0.0.1:3211  # 本地自检
 
 ## 附：技术参考（不用读，卡住时我再翻）
 
+- `launch/deploy-values.md`：**可复制的 DNS / WAF / SSL / 发件域 / 站长验证配置包**，回合 4–6 用
 - `DEPLOY.md` 第 16 节：Cloudflare / Resend / 域名 / 英语区完整命令与故障速查
 - `README.md`：后台各面板、环境变量、邮件通知说明
 - `SEO-GEO.md`：关键词地图、AI 引用监测、内容计划
 - `render.yaml`：托管部署蓝图；`Dockerfile`：换平台时用
-- `tests/`：121 项端到端 + 14 项邮件 + 5 项持久卷回归测试
+- `tests/`：139 项端到端 + 14 项邮件 + 5 项持久卷回归测试
+- 已内置的英语区合规：`/privacy` 隐私政策页、Cookie 同意横幅、Consent Mode v2、安全响应头（见 `launch/deploy-values.md` H 段）

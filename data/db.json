@@ -64,7 +64,9 @@
     "inquiryWebhook": "",
     "inquiryEmail": "info@hanxvonfluid.cn",
     "aiCrawlersAllow": true,
-    "contentUpdatedAt": "2026-11-11T07:09:02.958Z"
+    "cookieConsentEnabled": true,
+    "privacyUpdatedAt": "11 November 2026",
+    "contentUpdatedAt": "2026-11-11T09:29:37.615Z"
   },
   "categories": [
     {

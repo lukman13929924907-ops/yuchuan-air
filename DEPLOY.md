@@ -670,4 +670,14 @@ curl -s "$D/robots.txt" | grep -iE "GPTBot|Sitemap"
 | Resend 返回 422 | `EMAIL_FROM` 的域名未验证；改用 `onboarding@resend.dev` 或完成域名验证 |
 | 通知邮件进垃圾箱 | 发件域名缺 DKIM/SPF，或 `hanxvonfluid.cn` 缺 DMARC |
 | AI 爬虫 403 | Bot Fight Mode / WAF，见 16.3 |
+| 加了第二条 SPF TXT 后邮件全进垃圾箱 | 一个域名只能有一条 SPF；把 `include:resend.com` 合并进现有那条 |
+| 出现两个 HSTS 头 | Cloudflare 与源站同时开启；关掉 Cloudflare 的 HSTS，保留源站的 |
+
+### 16.9 可复制配置包与英语区隐私合规
+
+- **`launch/deploy-values.md`**：Cloudflare DNS 记录表、Resend 发件域验证、WAF 放行 AI 爬虫的表达式、SSL 设置、GSC / Bing 验证与后台最终字段清单。域名定了把 `YOUR_DOMAIN` / `ORIGIN_HOST` 替换即可。
+- **`launch/acceptance.sh`**：一键验收（含 6 个 AI 爬虫 UA、SSR 正文、canonical、隐私页、安全头）。
+- **隐私合规已内置**：`/privacy` 服务端渲染的隐私政策页、Cookie 同意横幅、Google Consent Mode v2（默认 `denied`）、Meta / LinkedIn 标签同意后才注入、页脚可随时撤回同意、联系表单隐私告知。后台 `Site Settings → Privacy & compliance` 可开关，`privacyUpdatedAt` 可改政策日期。
+- **上线前请让法务复核 `/privacy`**：页面里是通用模板（含 HTML 注释提示），保留期、跨境传输、监管机构等表述需按实际业务与目标市场确认。
+- **安全头**：`X-Content-Type-Options` / `Referrer-Policy` / `X-Frame-Options` / `Permissions-Policy`，HTTPS 下额外 `Strict-Transport-Security`。未启用 CSP（站点用内联 JSON-LD 与初始化脚本，需 nonce 改造；如需上，先用 Report-Only 观察）。
 

@@ -745,7 +745,8 @@ const PAGE_MAP = {
   '/applications': 'applications.html',
   '/about': 'about.html',
   '/blog': 'blog.html',
-  '/contact': 'contact.html'
+  '/contact': 'contact.html',
+  '/privacy': 'privacy.html'
 };
 
 const ADMIN_PAGES = {
@@ -926,6 +927,13 @@ async function dispatch(req, res) {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('Permissions-Policy',
+    'camera=(), microphone=(), geolocation=(), payment=(), usb=()');
+  // HSTS only over a real TLS request (or behind Cloudflare with FORCE_HTTPS=1).
+  // Do NOT also enable Cloudflare's HSTS toggle, or the header is duplicated.
+  if (isSecureRequest(req)) {
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  }
 
   if (pathname.startsWith('/api/')) {
     const parts = pathname.split('/').filter(Boolean); // ['api', 'products', ...]

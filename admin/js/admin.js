@@ -197,6 +197,9 @@
     { key: 'googleAdsConversionLabel', label: 'Google Ads Conversion Label', type: 'text' },
     { key: 'metaPixelId', label: 'Meta (Facebook) Pixel ID', type: 'text' },
     { key: 'linkedinPartnerId', label: 'LinkedIn Insight Tag Partner ID', type: 'text' },
+    { section: 'Privacy & compliance (EU / UK visitors)' },
+    { key: 'cookieConsentEnabled', label: 'Require cookie consent before loading analytics', type: 'checkbox', default: true, hint: 'Keep ON for English-speaking / EU / UK markets. Google tags run in Consent Mode v2 (denied by default); Meta and LinkedIn tags are only loaded after the visitor accepts. Turning it OFF may breach GDPR / ePrivacy and limits Google Ads conversion data.' },
+    { key: 'privacyUpdatedAt', label: 'Privacy Policy "Last updated" date', type: 'text', hint: 'Shown on /privacy. Update it whenever you change the policy.' },
     { section: 'Lead notifications' },
     { key: 'inquiryEmail', label: 'Inquiry notification recipient', type: 'text', hint: 'Where new-inquiry emails are delivered (default info@hanxvonfluid.cn). For security the sending credentials are NOT stored here: set EMAIL_PROVIDER / EMAIL_API_KEY / EMAIL_FROM on the server. See DEPLOY.md section 16.4. Verify by submitting one test inquiry.' },
     { key: 'inquiryWebhook', label: 'Instant inquiry Webhook URL (optional extra channel)', type: 'text', hint: 'Paste a Slack, WeCom, Feishu, DingTalk, Zapier or Make webhook. Every new inquiry is pushed there within seconds, in addition to the email.' }
