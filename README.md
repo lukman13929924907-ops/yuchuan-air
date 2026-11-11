@@ -3,6 +3,9 @@
 面向海外客户的响应式英文外贸站，复刻参考站的**工业空气过滤/除尘设备**产品思路，公司名称为
 **Shandong Yuchuan Environmental Protection and Energy Saving Technology Co., Ltd.**
 
+> **准备正式上线？按 [LAUNCH-STEPS.md](./LAUNCH-STEPS.md) 一回合一步操作**（只需登录 / 授权 / 粘贴，其余配置与脚本已备好）。
+> 一键验收：`bash launch/acceptance.sh https://你的域名`。技术参考再看 [DEPLOY.md](./DEPLOY.md) 第 16 节。
+
 ## 为什么这样设计
 
 | 需求 | 实现方式 |
