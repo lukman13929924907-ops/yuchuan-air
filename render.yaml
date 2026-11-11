@@ -31,6 +31,9 @@ services:
         sync: false
       - key: EMAIL_FROM
         sync: false
+      # NOTE: admin Settings -> "Inquiry notification recipient" (data/db.json)
+      # OVERRIDES EMAIL_TO (see lib/mailer.js recipient()). In Resend test mode
+      # (2A) both must point at the Resend signup mailbox, or sends fail with 403.
       - key: EMAIL_TO
         value: info@hanxvonfluid.cn
     disk:

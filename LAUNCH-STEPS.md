@@ -8,9 +8,9 @@
 ## 先看结论
 
 网站**代码与部署配置已经 100% 就绪**，本地 git 仓库已建好并已推送到 GitHub 私有仓库
-（39 个文件，`d7b692d`）。现在缺的不是开发，而是剩下 2 次平台登录授权（Resend、Render）。
+（39 个文件）。现在缺的不是开发，而是最后 **1 次平台登录授权（Render）**。
 
-**做完回合 2–3，网站就已经在公网正式运行、能收询盘邮件了** —— 只是网址还是
+**做完回合 3，网站就已经在公网正式运行、能收询盘邮件了** —— 只是网址还是
 `xxx.onrender.com`。域名（你说的"最后绑定"）只是最后换门牌，不需要重做网站，
 `Canonical Site URL` 在后台改一次，全站 canonical / sitemap / llms.txt / JSON-LD 会自动跟着变。
 
@@ -18,8 +18,8 @@
 | --- | --- | --- | --- | --- |
 | 0 | 无 | 填一张公司信息表 | ~~见下方模板~~ | ✅ 已完成 2026-11-11 |
 | 1 | GitHub | 建**私有**仓库 + 提供地址 | ~~仓库地址~~ | ✅ 已完成 2026-11-11 |
-| 2 | Resend | 建一个 API Key（Key 不用发我） | 注册邮箱 + 发件方式 | ✅ 立刻 |
-| 3 | Render | 导入蓝图 + 粘贴 3 个值 | 源站地址 | ✅ 立刻（回合 2 之后） |
+| 2 | Resend | ~~建 API Key + 回我注册邮箱 / 方式~~ | — | ✅ 已完成 2026-11-11 |
+| 3 | Render | 导入蓝图 + 粘贴 3 个值 | 源站地址 | ✅ **现在从这里开始** |
 | 4 | 阿里云 | 买域名 | 域名 | ⏸ 最后 |
 | 5 | Cloudflare | 改 NS + 加我给的记录 | NS 已改 | ⏸ 最后 |
 | 6 | Google / Bing | 站长验证授权 | 验证完成 | ⏸ 最后 |
@@ -90,30 +90,56 @@ LinkedIn 公司主页 URL。这些随时可以在后台补，不影响回合 1�
 
 ---
 
-## 回合 2｜Resend 发信通道（约 5 分钟）← **现在从这里开始**
+## 回合 2｜Resend 发信通道 ✅ 已完成（2026-11-11，方式 2A）
 
-邮箱地址 ≠ 发信通道。`info@hanxvonfluid.cn` 是**收件**地址，网站要自动发信还需要一个发件服务。
+**你给的**：注册邮箱 `lukman13929924907@gmail.com`、方式 2A、一把仅发信权限的 API Key。
+Key 已写入本机 `launch/local-secrets.txt`（该文件被 `.gitignore` 忽略，**不会进 GitHub、不会进预览站**）。
 
-**你要做的**：
+**我做的实测**（用真实 API 与项目自己的 `lib/mailer.js` 跑过，不是推测）：
 
-1. 登录 / 注册 Resend → 左侧 **API Keys** → **Create API Key** → 复制 `re_...`
-   **这个值不要发给我**，留到回合 3 直接粘进 Render 的变量框。
-2. 回我注册 Resend 时用的**邮箱**（非敏感），以及选哪种发件方式：
+| 验证项 | 结果 |
+| --- | --- |
+| `POST /emails` → 注册邮箱 | **200**，邮件 ID `01a1ca41-...`；请查收标题 `Yuchuan Air - Resend delivery test` |
+| `GET /domains`、`GET /api-keys` | 401 `restricted_api_key` —— **Key 没坏**，只是仅发信权限、读不了账户信息，对本项目用途完全够 |
+| 用真实 `sendInquiryEmail()` 发一封带 UTM 归因与 `Reply-To` 的模拟询盘 | **成功**，日志 `[mailer] inquiry email sent to lukman13929924907@gmail.com` |
 
-| 方式 | 做法 | 适合 |
-| --- | --- | --- |
-| **2A 最省事** | 直接用 `info@hanxvonfluid.cn` 注册 Resend。测试发件人 `onboarding@resend.dev` 只能发给注册邮箱，这样询盘邮件立刻就到企业邮箱 | 想现在就跑通 |
-| **2B 推荐（不需要新域名）** | Resend → **Domains** → 添加 `hanxvonfluid.cn` → 我给你 3 条 TXT 记录内容 → 你在该域名 DNS 后台加记录（**只加 TXT，不动 MX，不影响现有企业邮箱**）→ 验证通过后发件人改成 `Yuchuan Air <noreply@hanxvonfluid.cn>` | 长期正规、发件人显示自家域名 |
-| 2C | 等新域名买好再验证发件域 | 邮件可以晚点到 |
+### ⚠️ 必须知道：2A 发不到企业邮箱
 
-**回我一句**：`回合2完成：注册邮箱=xxx；方式=2A`（或 2B / 2C）
+因为**注册邮箱是 Gmail，不是 `info@hanxvonfluid.cn`**，Resend 的测试发件人
+`onboarding@resend.dev` 只能发给注册邮箱。实测发往企业邮箱被拒：
 
-**我接着做**：给你回合 3 要粘的 `EMAIL_FROM` / `EMAIL_TO` 精确值；若选 2B，把 DKIM / SPF / DMARC 的 TXT 记录逐条列给你。
-**完成标志**：确定发件人；Key 在你手里、从未经过对话。
+```text
+403 validation_error
+You can only send testing emails to your own email address
+(lukman13929924907@gmail.com). To send emails to other recipients,
+please verify a domain at resend.com/domains ...
+```
+
+所以 **2A 阶段询盘发到 `lukman13929924907@gmail.com`** —— 仍是你自己的邮箱、一条不丢
+（同时存进后台 `Inquiries`），只是暂时不在企业邮箱。要直达 `info@hanxvonfluid.cn` 必须切 **2B**。
+
+> 另一个已查明的优先级陷阱：`lib/mailer.js` 的 `recipient()` 里，
+> **后台 `Site Settings → Inquiry notification recipient` 会覆盖 `render.yaml` 的 `EMAIL_TO`**。
+> 种子值是 `info@hanxvonfluid.cn`，所以只改 Render 变量没用，2A 阶段这个后台字段也必须改成
+> Gmail —— **回合 3 上线后我用管理员接口代改，不用你动手。**
+
+### 切 2B（想让询盘直达企业邮箱时随时可切，不用等新域名）
+
+1. Resend → **Domains → Add Domain** → 填 `hanxvonfluid.cn`
+   （这把 Key 仅发信权限、读不了域名接口，需要你在控制台点一下，把页面给出的 TXT 值发我）
+2. 我逐条给你 TXT 精确值 → 你在管理 `hanxvonfluid.cn` 解析的平台加记录
+   （**只加 TXT，绝对不动 MX**，不影响现有企业邮箱收发）
+3. Resend 显示 `Verified` 后我改 2 处：`EMAIL_FROM` → `Yuchuan Air <noreply@hanxvonfluid.cn>`、
+   后台通知收件人 → `info@hanxvonfluid.cn`；`render.yaml` 的 `EMAIL_TO` 本来就是企业邮箱，不用动
+4. 提交测试询盘，确认日志 `[mailer] inquiry email sent to info@hanxvonfluid.cn`
+
+TXT 细节见 `launch/deploy-values.md` B 段（含「SPF 只能有一条、必须合并」的坑）。
+
+**完成标志已达成**：发件人确定为 `onboarding@resend.dev`，Key 安全落地且发信链路实测成功。
 
 ---
 
-## 回合 3｜Render 部署（约 8 分钟）— **这一步做完网站就上线了**
+## 回合 3｜Render 部署（约 8 分钟）← **现在从这里开始，做完网站就上线了**
 
 **你要做的**：
 
@@ -121,14 +147,15 @@ LinkedIn 公司主页 URL。这些随时可以在后台补，不影响回合 1�
 2. 页面会自动读根目录 `render.yaml`：一个 Web Service + 1 GB 持久盘（挂 `/var/lib/yuchuan`）
 3. 出现 3 个 `sync: false` 变量框，从本地 `launch/local-secrets.txt` 复制粘贴：
 
-   | 变量 | 值从哪来 |
+   | 变量 | 精确值（可直接照抄） |
    | --- | --- |
    | `ADMIN_PASSWORD` | `launch/local-secrets.txt` 里的 19 位强密码（也是正式站后台登录密码） |
-   | `EMAIL_API_KEY` | 回合 2 复制的 `re_...` |
-   | `EMAIL_FROM` | 我按你选的 2A / 2B 给的确切值 |
+   | `EMAIL_API_KEY` | `launch/local-secrets.txt` 里的 `re_...`（已实测可用） |
+   | `EMAIL_FROM` | `onboarding@resend.dev` ← 方式 2A 的最终确定值 |
 
    其余 `EMAIL_PROVIDER`、`EMAIL_TO`、`DATA_DIR`、`FORCE_HTTPS`、`NODE_VERSION`
    已写在 `render.yaml` 里，不用填。
+   > ⚠️ 若你已切 2B，把 `EMAIL_FROM` 换成 `Yuchuan Air <noreply@hanxvonfluid.cn>` 即可。
 4. 点 **Apply / Deploy**，等状态变 `Live`
 
 **回我一句**：`回合3完成：https://xxx.onrender.com`
@@ -137,11 +164,13 @@ LinkedIn 公司主页 URL。这些随时可以在后台补，不影响回合 1�
 
 - 跑 `launch/acceptance.sh` 源站版：15 产品 / 6 文章 / 14 FAQ、SSR、canonical、robots、llms.txt
 - 确认日志出现 `[store] seeded empty data volume from bundled db.json`（空持久卷自动带出完整目录）
+- **把后台 `Inquiry notification recipient` 从 `info@hanxvonfluid.cn` 改成 `lukman13929924907@gmail.com`**
+  （2A 必需；它的优先级高于 `EMAIL_TO`，不改的话发信会被 Resend 403 拒绝）
 - 打开 `/admin` → `Site Settings` 顶部确认绿色 `Inquiry email is ACTIVE`
-- 提交一条测试询盘，确认 `info@hanxvonfluid.cn` 收到邮件（含 UTM / 来源归因、`Reply-To`=买家邮箱）
+- 提交一条测试询盘，确认 `lukman13929924907@gmail.com` 收到邮件（含 UTM / 来源归因、`Reply-To`=买家邮箱）
 - 删掉测试询盘，交付一份验收结果
 
-**完成标志**：**网站已在公网运行、后台能改产品文章、询盘能发到你企业邮箱。**
+**完成标志**：**网站已在公网运行、后台能改产品文章、询盘邮件能收到**（2A 到 Gmail，切 2B 后到企业邮箱）。
 此时可以先开始投内容、跑小额广告；域名只是最后换网址。
 
 > 技术约束（已替你处理）：Cloudflare 的 DNS/SSL/WAF 只是边缘反代，不跑 Node、不存文件，

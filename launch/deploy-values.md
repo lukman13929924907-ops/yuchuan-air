@@ -28,6 +28,16 @@
 
 ## B. Resend 发件域验证（推荐方式 2B，不需要等新域名）
 
+> **当前状态（2026-11-11）：已按方式 2A 配置并实测发信成功。**
+> 注册邮箱是 `lukman13929924907@gmail.com`，因此 Resend 测试发件人
+> `onboarding@resend.dev` **只能发到该 Gmail**；发往 `info@hanxvonfluid.cn` 实测返回
+> `403 validation_error`。2A 阶段询盘到 Gmail（同时存进后台 Inquiries，不会丢），
+> 要让询盘直达企业邮箱，按本段验证 `hanxvonfluid.cn` 发件域即可。
+>
+> 另注意：现有 API Key 是 **restricted（仅发信）权限**，无法调用 `/domains` 接口读取 DNS 记录，
+> 所以第 1–2 步需要你在 Resend 控制台点 **Add Domain**，把页面显示的 TXT 值复制给我；
+> 我据此给你逐条精确记录内容与填写位置。`EMAIL_API_KEY` 本身不用换。
+
 用**已有的企业邮箱域名** `hanxvonfluid.cn` 做发件域，邮件可以立刻正规地发到
 `info@hanxvonfluid.cn`，完全不必等新域名买好。
 
@@ -35,11 +45,14 @@
 2. 把 Resend 给出的 DKIM / SPF TXT 记录，加到**管理 `hanxvonfluid.cn` 解析的那个平台**
    （可能是阿里云云解析、腾讯 DNSPod 或邮箱服务商后台，取决于你们企业邮箱托管在哪）
 3. **只加 TXT，绝对不要改 MX 记录** —— 否则现有企业邮箱会收不到信
-4. 等 Resend 显示 `Verified`，然后把 Render 环境变量改成：
+4. 等 Resend 显示 `Verified`，然后改这 **2 处**：
    ```
-   EMAIL_FROM = Yuchuan Air <noreply@hanxvonfluid.cn>
-   EMAIL_TO   = info@hanxvonfluid.cn
+   Render 环境变量 EMAIL_FROM = Yuchuan Air <noreply@hanxvonfluid.cn>
+   后台 Site Settings → Inquiry notification recipient = info@hanxvonfluid.cn
    ```
+   `render.yaml` 里的 `EMAIL_TO` 本来就是 `info@hanxvonfluid.cn`，不用动。
+   ⚠️ **后台字段优先级高于 `EMAIL_TO`**（见 `lib/mailer.js` 的 `recipient()`）：
+   只改 Render 变量不会生效，漏掉后台这一处会继续发到 Gmail，或用测试发件人时被 403 拒绝。
 5. 提交一条测试询盘，看服务端日志 `[mailer] inquiry email sent to info@hanxvonfluid.cn`
 
 > ⚠️ **SPF 常见错误**：一个域名只能有**一条** SPF TXT 记录。如果 `hanxvonfluid.cn`

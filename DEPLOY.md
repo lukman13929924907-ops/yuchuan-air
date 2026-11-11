@@ -628,9 +628,18 @@ done
 #### 16.8.4 配置询盘邮件（Resend）
 
 1. Resend → API Keys → 创建，把值填到 `EMAIL_API_KEY`。
-2. **测试期**：`EMAIL_FROM=onboarding@resend.dev`，`EMAIL_TO` 临时填你注册 Resend 的邮箱（该测试发件人只能发给注册邮箱）。
-3. **正式**：Resend → Domains 添加 `yourdomain.com` → 按提示在 **Cloudflare DNS** 里加 DKIM / SPF 的 TXT 记录 → 验证通过后设 `EMAIL_FROM=Yuchuan Air <noreply@yourdomain.com>`、`EMAIL_TO=info@hanxvonfluid.cn`。
-4. 先在后台 `Site Settings` 顶部确认出现绿色的 `Inquiry email is ACTIVE`（若为红色说明 `EMAIL_PROVIDER` / `EMAIL_API_KEY` / `EMAIL_FROM` 有缺项，不必提交询盘盲测）。再提交一条测试询盘，确认服务端日志 `[mailer] inquiry email sent to info@hanxvonfluid.cn`，并检查收件箱与垃圾箱。
+2. **测试期（方式 2A）**：`EMAIL_FROM=onboarding@resend.dev`，并把**后台
+   `Site Settings → Inquiry notification recipient` 改成注册 Resend 的邮箱**。
+   ⚠️ 只改 `EMAIL_TO` 无效：`lib/mailer.js` 的 `recipient()` 让后台字段**覆盖** `EMAIL_TO`。
+   测试发件人只能发给注册邮箱，发往其他地址实测返回 403 `validation_error`。
+3. **正式**：Resend → Domains 添加 `yourdomain.com`（也可直接用已有企业邮箱域名
+   `hanxvonfluid.cn`，**不必等新域名**）→ 按提示加 DKIM / SPF 的 TXT 记录 → 验证通过后设
+   `EMAIL_FROM=Yuchuan Air <noreply@yourdomain.com>`，并把后台通知收件人改回
+   `info@hanxvonfluid.cn`。
+4. 先在后台 `Site Settings` 顶部确认出现绿色的 `Inquiry email is ACTIVE`（若为红色说明
+   `EMAIL_PROVIDER` / `EMAIL_API_KEY` / `EMAIL_FROM` 有缺项，不必提交询盘盲测）。再提交一条
+   测试询盘，确认服务端日志 `[mailer] inquiry email sent to <当前通知收件人>`（2A 为注册邮箱），
+   并检查收件箱与垃圾箱。
 5. 按 16.4 检查 `hanxvonfluid.cn` 的 SPF / DKIM / DMARC——这决定销售「直接回复」时能否送达买家。
 6. 邮件 `Reply-To` 已自动设为客户邮箱；正文含渠道、UTM、gclid / fbclid、referrer、落地页归因。
 
