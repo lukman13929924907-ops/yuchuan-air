@@ -79,12 +79,17 @@ let s=""; process.stdin.on("data",d=>s+=d).on("end",()=>{
       company:String(t.companyName||"").indexOf("Shandong Yuchuan")===0,
       products:(j.counts&&j.counts.products)===15,
       email:t.email==="info@hanxvonfluid.cn",
+      phone:String(t.phone||"").replace(/\s/g,"")==="+8653183516866",
+      whatsapp:String(t.whatsapp||"").replace(/\s/g,"")==="+8617278827749",
+      founded:String(t.founded||"")==="2018",
+      verifiedFacts:/35\+/.test(JSON.stringify(t.stats||{}))&&/1,900\+/.test(JSON.stringify(t.stats||{})),
+      credentials:/ISO 9001/.test(String(t.certifications||""))&&/Registered Environmental Engineer/.test(String(t.certifications||"")),
       noSecrets:secrets.length===0
     };
     console.log(JSON.stringify(out));
   } catch(e) { console.log("{}"); }
 });')
-for key in company products email noSecrets; do
+for key in company products email phone whatsapp founded verifiedFacts credentials noSecrets; do
   case "$API_OK" in *"\"$key\":true"*) ck "api/site: $key" 1;; *) ck "api/site: $key" 0;; esac
 done
 
@@ -126,12 +131,18 @@ case "$D" in
 esac
 
 echo
-echo '--- 9. Reminders (informational) ---'
+echo '--- 9. Verified company facts (no placeholder numbers) ---'
 HOME_HTML=$(curl -s --max-time 20 "$D/")
-case "$HOME_HTML" in *'8899 0666'*) echo 'NOTE  placeholder phone +86 531 8899 0666 is still on the site (round 0)';;
-  *) echo 'NOTE  placeholder phone replaced'; esac
-case "$HOME_HTML" in *'12+'*) echo 'NOTE  placeholder stats (12+ / 60+ / 2,000+) are still on the site (round 0)';;
-  *) echo 'NOTE  placeholder stats replaced'; esac
+ABOUT_HTML=$(curl -s --max-time 20 "$D/about")
+LLMS=$(curl -s --max-time 20 "$D/llms.txt")
+case "$HOME_HTML" in *'8351 6866'*) ck 'real phone rendered in header/footer' 1;; *) ck 'real phone rendered in header/footer' 0;; esac
+case "$HOME_HTML" in *'Since 2018'*) ck 'homepage shows Since 2018' 1;; *) ck 'homepage shows Since 2018' 0;; esac
+case "$HOME_HTML" in *'1,900+'*) case "$HOME_HTML" in *'35+'*) ck 'homepage shows verified install figures' 1;; *) ck 'homepage shows verified install figures' 0;; esac;; *) ck 'homepage shows verified install figures' 0;; esac
+case "$ABOUT_HTML" in *'Registered Environmental Engineer'*) ck 'about page lists real qualifications' 1;; *) ck 'about page lists real qualifications' 0;; esac
+case "$LLMS" in *'35+ Countries with Installed Projects'*) ck 'llms.txt carries verified figures' 1;; *) ck 'llms.txt carries verified figures' 0;; esac
+case "$HOME_HTML$ABOUT_HTML$LLMS" in *'8899 0666'*|*'8888 0666'*|*'12+'*|*'60+'*|*'2,000+'*|*'72 hours'*|*'Ships in 72 Hours'*)
+  ck 'no leftover placeholder phone / stats / delivery claim' 0;;
+  *) ck 'no leftover placeholder phone / stats / delivery claim' 1;; esac
 echo 'NOTE  check /admin -> Site Settings top banner shows "Inquiry email is ACTIVE"'
 echo 'NOTE  submit one test inquiry, then confirm delivery to info@hanxvonfluid.cn and delete it'
 

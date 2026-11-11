@@ -4,7 +4,7 @@
     "shortName": "Yuchuan Air",
     "tagline": "Industrial Air Filtration & Energy Saving Solutions",
     "siteUrl": "",
-    "heroBadge": "Ships in 72 Hours",
+    "heroBadge": "ISO 9001 / ISO 14001 / CE Certified",
     "heroTitle": "Advanced Air Filtration Systems",
     "heroText": "Capture airborne contaminants straight from the source with advanced dust collectors, fume extractors and industrial-grade air purification equipment engineered by Shandong Yuchuan. Built for the daily rigours of manufacturing, our rugged, powder-coated units deliver years of reliable performance on any shop floor.",
     "heroPrimaryLabel": "Explore Products",
@@ -12,40 +12,44 @@
     "introTitle": "Tailored Air Pollution Solutions",
     "introText": "With a wide selection of machinery available in standard and application-specific configurations, the ideal air filtration system for your facility is waiting to be discovered. Browse our catalog of dust collectors, fume extractors, downdraft tables and booths, or talk to one of our industrial air purification engineers today.",
     "commitmentTitle": "Our Commitment to You",
-    "commitmentText": "Shandong Yuchuan Environmental Protection and Energy Saving Technology Co., Ltd. designs and manufactures industrial air filtration, dust collection and energy-saving equipment for workshops of every size. We help manufacturers stay compliant with workplace safety regulations while protecting the health of their people and lowering energy consumption. One size never fits all, which is why every solution is right-sized to your process.",
+    "commitmentText": "Founded in 2018, Shandong Yuchuan Environmental Protection and Energy Saving Technology Co., Ltd. designs and manufactures industrial air filtration, dust collection and energy-saving equipment for workshops of every size. More than 1,900 systems have been installed in over 35 countries. We hold a business licence, ISO 9001, ISO 14001 and CE certification, registered environmental engineer credentials and engineering design qualifications. Every solution is right-sized to your process.",
     "resourcesTitle": "Valuable Resources",
     "resourcesText": "Practical engineering knowledge for cleaner, safer and more efficient production environments.",
     "ctaTitle": "Ready for Cleaner Air in Your Facility?",
     "ctaText": "Tell us about your application and our engineers will recommend a right-sized capture-at-source solution, with a quotation delivered promptly.",
-    "founded": "2012",
+    "founded": "2018",
+    "sinceLabel": "Since 2018",
     "email": "info@hanxvonfluid.cn",
-    "phone": "+86 531 8899 0666",
-    "whatsapp": "+86 156 8888 0666",
-    "address": "Jinan, Shandong Province, China",
-    "workingHours": "Monday - Friday, 08:30 - 18:00 (GMT+8)",
+    "phone": "+86 531 8351 6866",
+    "whatsapp": "+86 172 7882 7749",
+    "address": "Environmental Protection Industrial Park, Zhangqiu District, Jinan, Shandong Province, China",
+    "addressLocality": "Jinan",
+    "addressRegion": "Shandong Province",
+    "addressCountry": "CN",
+    "workingHours": "08:00 - 21:00 Beijing Time (GMT+8)",
     "footerNote": "Industrial air filtration, dust collection and energy-saving systems for global manufacturers.",
     "seoTitle": "Industrial Air Filtration & Dust Collection Systems | Shandong Yuchuan",
     "seoDescription": "Shandong Yuchuan Environmental Protection and Energy Saving Technology Co., Ltd. supplies industrial dust collectors, welding fume extractors, wet dust collectors, downdraft tables, ambient air cleaners and oil mist collectors for worldwide manufacturers.",
     "seoKeywords": "industrial air filtration, dust collector, welding fume extractor, wet dust collector, cartridge dust collector, downdraft table, oil mist collector, Shandong Yuchuan",
     "stats": [
       {
-        "value": "12+",
-        "label": "Years of Engineering"
+        "value": "2018",
+        "label": "Year Established"
       },
       {
-        "value": "60+",
-        "label": "Countries Served"
+        "value": "35+",
+        "label": "Countries with Installed Projects"
       },
       {
-        "value": "2,000+",
+        "value": "1,900+",
         "label": "Systems Installed"
       },
       {
-        "value": "72h",
-        "label": "Quick-Ship Lead Time"
+        "value": "08:00-21:00",
+        "label": "Service Hours (GMT+8)"
       }
     ],
-    "certifications": "ISO 9001 / ISO 14001 / CE compliant designs",
+    "certifications": "Business Licence / ISO 9001 / ISO 14001 / CE / Registered Environmental Engineer / Engineering Design Qualification",
     "ogImage": "/img/og-image.svg",
     "logoUrl": "",
     "linkedinUrl": "",
@@ -66,7 +70,7 @@
     "aiCrawlersAllow": true,
     "cookieConsentEnabled": true,
     "privacyUpdatedAt": "11 November 2026",
-    "contentUpdatedAt": "2026-11-11T09:29:37.615Z"
+    "contentUpdatedAt": "2026-11-11T10:24:14.388Z"
   },
   "categories": [
     {
@@ -74,7 +78,7 @@
       "slug": "quick-ship",
       "name": "Quick-Ship Series",
       "series": "QuickShip",
-      "description": "In-stock dust and fume collection units ready to ship within 72 hours, so your air quality gets back on track fast.",
+      "description": "Standard dust and fume collection units for common single-station applications. Lead time is confirmed with each quotation.",
       "image": "",
       "published": true,
       "order": 1
@@ -177,10 +181,10 @@
       "name": "QuickShip QS-1000 Portable Fume Extractor",
       "category": "quick-ship",
       "series": "QuickShip",
-      "summary": "Our best-selling mobile fume extractor, kept in stock and ready to dispatch within 72 hours.",
-      "description": "The QuickShip QS-1000 is a ready-to-ship, single-arm portable welding fume extractor for fabrication shops that need compliant source capture without a long lead time. It arrives fully assembled: position the arm, connect power and start work. A multi-stage filter train removes welding smoke and fine particulate before returning clean air to the workshop.",
+      "summary": "A mobile single-arm fume extractor for welding stations, supplied fully assembled and ready to connect to power.",
+      "description": "The QuickShip QS-1000 is a single-arm portable welding fume extractor for fabrication shops that need compliant source capture at a single workstation. It arrives fully assembled: position the arm, connect power and start work. A multi-stage filter train removes welding smoke and fine particulate before returning clean air to the workshop.",
       "features": [
-        "In stock - ships within 72 hours",
+        "Standard configuration - lead time confirmed with quotation",
         "Tool-free filter access for fast maintenance",
         "Lockable swivel castors for easy repositioning",
         "Low-noise, energy-saving EC motor"
@@ -969,7 +973,7 @@
       "title": "Importing Air Filtration Equipment: An Export Project Checklist",
       "category": "Export & Logistics",
       "excerpt": "Voltage, documentation, spare parts and installation planning - what overseas buyers should confirm before an order ships.",
-      "content": "<p>Buying industrial air filtration equipment across borders is straightforward when the right details are agreed up front. Here is the checklist we walk through with every overseas customer.</p><h2>Technical confirmation</h2><ul><li>Supply voltage, frequency and plug / terminal standard at the destination.</li><li>Material being processed, dust characteristics and number of simultaneous capture points.</li><li>Required airflow, static pressure and any local compliance standards.</li><li>Indoor or outdoor installation and available footprint.</li></ul><h2>Commercial documentation</h2><p>Confirm the commercial invoice, packing list, bill of lading, certificate of origin and any required CE / ISO documentation before the vessel sails. We prepare the full document package and share drafts for review.</p><h2>Packing and protection</h2><p>Equipment is shipped in plywood cases with anti-corrosion protection and shock indicators. Filter cartridges travel separately to avoid damage during handling.</p><h2>Commissioning and spares</h2><p>Agree in advance whether commissioning is remote or on site, and include a recommended consumables kit in the first shipment. It is far cheaper to ship spares with the machine than to air-freight them later.</p><h2>Lead times</h2><p>Standard QuickShip models dispatch within 72 hours. Engineered booths and central systems typically require a design review followed by a production slot - our team provides a dated schedule with every quotation.</p>",
+      "content": "<p>Buying industrial air filtration equipment across borders is straightforward when the right details are agreed up front. Here is the checklist we walk through with every overseas customer.</p><h2>Technical confirmation</h2><ul><li>Supply voltage, frequency and plug / terminal standard at the destination.</li><li>Material being processed, dust characteristics and number of simultaneous capture points.</li><li>Required airflow, static pressure and any local compliance standards.</li><li>Indoor or outdoor installation and available footprint.</li></ul><h2>Commercial documentation</h2><p>Confirm the commercial invoice, packing list, bill of lading, certificate of origin and any required CE / ISO documentation before the vessel sails. We prepare the full document package and share drafts for review.</p><h2>Packing and protection</h2><p>Equipment is shipped in plywood cases with anti-corrosion protection and shock indicators. Filter cartridges travel separately to avoid damage during handling.</p><h2>Commissioning and spares</h2><p>Agree in advance whether commissioning is remote or on site, and include a recommended consumables kit in the first shipment. It is far cheaper to ship spares with the machine than to air-freight them later.</p><h2>Lead times</h2><p>Standard configurations and engineered booths or central systems are built to order; our team provides a dated production and shipping schedule with every quotation.</p>",
       "cover": "",
       "author": "Yuchuan Export Team",
       "date": "2026-04-09",
@@ -1059,9 +1063,25 @@
       "order": 2
     },
     {
+      "id": "faq-13",
+      "question": "What certifications and qualifications does Shandong Yuchuan hold?",
+      "answer": "Shandong Yuchuan holds a business licence, ISO 9001 quality management certification, ISO 14001 environmental management certification and CE certification for applicable equipment, as well as registered environmental engineer credentials and engineering design qualifications. Certificate copies and the exact scope of each approval are available on request with your quotation.",
+      "scope": "company",
+      "published": true,
+      "order": 13
+    },
+    {
+      "id": "faq-14",
+      "question": "How much installation experience does Shandong Yuchuan have?",
+      "answer": "Founded in 2018 and based in the Environmental Protection Industrial Park, Zhangqiu District, Jinan, Shandong Province, China, Shandong Yuchuan has completed installed projects in more than 35 countries and delivered over 1,900 systems. Our team is available 08:00 - 21:00 Beijing Time (GMT+8) at info@hanxvonfluid.cn, +86 531 8351 6866 or on WhatsApp +86 172 7882 7749.",
+      "scope": "company",
+      "published": true,
+      "order": 14
+    },
+    {
       "id": "faq-03",
       "question": "What is the typical lead time for a dust collector?",
-      "answer": "QuickShip models held in stock are dispatched within 72 hours of order confirmation. Configured cartridge and wet dust collectors are normally built to order; our engineers confirm the exact production slot with the quotation. Sea freight, customs clearance and destination port determine total delivery time, so request a shipping estimate together with the equipment quote.",
+      "answer": "Standard configurations are assembled to order and the production slot is confirmed with your quotation. Engineered cartridge and wet dust collectors, booths and central systems normally require a design review first. Sea freight, customs clearance and destination port determine total delivery time, so request a shipping estimate together with the equipment quote.",
       "scope": "products",
       "published": true,
       "order": 3

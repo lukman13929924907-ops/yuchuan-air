@@ -17,7 +17,7 @@
 - [ ] 一个域名（外贸站建议 `.com`），并完成 ICP/备案判断：服务器在中国大陆需备案；面向海外客户通常选中国香港/新加坡/美国机房，免备案
 - [ ] 一台 VPS：1 核 1 GB 内存即可，Ubuntu 22.04 / 24.04 LTS
 - [ ] 服务器已开放 80 / 443，SSH 可登录
-- [ ] 准备好真实公司联系方式（种子数据中的邮箱/电话为示例）
+- [x] 真实公司联系方式与统计已写入种子数据（2026-11-11，见 README「公司信息」）
 - [ ] 修改后台密码（见第 6 步）
 
 > 建议部署路径使用纯 ASCII，例如 `/var/www/yuchuan-air`，避免中文路径带来的编码与权限问题。
@@ -182,7 +182,7 @@ sudo ufw enable
 
 - [ ] **Backup & Security → Change admin password**：立即改掉初始密码
 - [ ] **Site Settings → Canonical Site URL**：填 `https://yourdomain.com`（影响 canonical 与 sitemap.xml）
-- [ ] **Site Settings**：把示例邮箱、电话、WhatsApp、地址、工作时间、公司统计换成真实信息
+- [x] **Site Settings**：真实电话、WhatsApp、地址、工作时间、2018 成立、35+ 国家、1,900+ 台套、真实资质已填好（2026-11-11）；只需核对一遍
 - [ ] **Products / Articles**：替换示例产品为真实型号，上传实拍图；不需要的示例内容可删除
 - [ ] 把 `robots.txt` 中 `Disallow: /admin` 保持不动；如额外加固，可在 Nginx 层给 `/admin` 加 IP 白名单或 HTTP Basic Auth
 
@@ -565,9 +565,9 @@ done
 
 - Cloudflare 全球边缘节点自动就近服务，无需单独选区；但**源站位置**决定缓存未命中时的延迟，英语区建议源站放美西 / 欧洲 / 新加坡，而不是国内机房。
 - 内容：全站英文、公制/英制双单位、CE / ISO / OSHA / ATEX 等英语区买家关注的合规表述（**必须是真实持有的资质**）。
-- 工作时间只写 `GMT+8 08:30-18:00` 会让欧美买家犹豫，建议改成 `Reply within 12 hours on business days` 之类的响应承诺。
+- 工作时间为真实的 `08:00 - 21:00 Beijing Time (GMT+8)`，即 `00:00–13:00 UTC`。单独写北京时间会让欧美买家犹豫，可在联系页补充 UTC 换算；若要额外写「Reply within 12 hours」等响应承诺，先确认团队能稳定做到。
 - 合规：GA4 / Google Ads / Meta Pixel / LinkedIn Insight 面向欧盟与英国访客需要 Cookie 同意与 Google Consent Mode v2；联系表单旁要有隐私政策链接（GDPR / UK GDPR）。
-- 事实一致性：GEO 引擎会交叉核对，`12+ 年`、`60+ 国家`、`ISO/CE` 等占位数字必须换成真实口径，否则会显著降低被引用概率。
+- 事实一致性：GEO 引擎会交叉核对。公司级数字已换成 `2018 / 35+ / 1,900+` 可验证事实，未确认的「72 小时发货」已删除；后续补真实产品型号时不要写入未经验证的性能值、交期或资质。
 
 ### 16.6 依赖顺序（域名到位后才能做的）
 

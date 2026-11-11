@@ -100,6 +100,12 @@ function typesOf(ld) {
   ck('home renders footer NAP from settings',
     home.indexOf(siteSettings.email) > -1 && home.indexOf(siteSettings.companyName) > -1,
     siteSettings.email);
+  ck('home renders real phone + WhatsApp from settings',
+    home.indexOf(siteSettings.phone) > -1 && home.indexOf(siteSettings.whatsapp) > -1);
+  ck('home renders verified company facts',
+    home.indexOf('Since 2018') > -1 && home.indexOf('1,900+') > -1 && home.indexOf('35+') > -1);
+  ck('home has no placeholder facts or unconfirmed delivery claims',
+    !/8899 0666|8888 0666|Since 2012|12\+|60\+|2,000\+|72 hours|Ships in 72 Hours/.test(home));
   ck('home has no loading placeholder', home.indexOf('Loading products…') === -1);
   ck('home has FAQ block', home.indexOf('faq-section') > -1);
   const homeLd = jsonLdOf(home);
@@ -107,6 +113,15 @@ function typesOf(ld) {
   ck('home has Organization + WebSite + FAQPage',
     ['Organization', 'WebSite', 'FAQPage'].every((t) => typesOf(homeLd).indexOf(t) > -1),
     typesOf(homeLd).join(','));
+  const orgNode = (homeLd['@graph'] || []).find((n) => n && n['@type'] === 'Organization') || {};
+  ck('Organization foundingDate is 2018', orgNode.foundingDate === '2018', String(orgNode.foundingDate));
+  ck('Organization address has city, region and country',
+    orgNode.address && orgNode.address.addressLocality === 'Jinan' &&
+    orgNode.address.addressRegion === 'Shandong Province' && orgNode.address.addressCountry === 'CN');
+  ck('Organization lists real credentials',
+    Array.isArray(orgNode.hasCredential) && orgNode.hasCredential.length >= 5 &&
+    orgNode.hasCredential.some((c) => /ISO 9001/.test(c.name || '')) &&
+    orgNode.hasCredential.some((c) => /Registered Environmental Engineer/.test(c.name || '')));
   ck('home canonical is absolute', /<link rel="canonical" href="https?:\/\//.test(home));
   ck('home has OG + Twitter image', home.indexOf('og:image') > -1 && home.indexOf('twitter:card') > -1);
   ck('home has hreflang', home.indexOf('hreflang="x-default"') > -1);
@@ -154,6 +169,12 @@ function typesOf(ld) {
   ck('llms.txt lists products', llms.indexOf('QuickShip QS-1000') > -1);
   ck('llms.txt lists categories', llms.indexOf('/collections/') > -1);
   ck('llms.txt lists contact', llms.indexOf('/contact') > -1);
+  ck('llms.txt carries verified company facts',
+    llms.indexOf('- Founded: 2018') > -1 &&
+    llms.indexOf('35+ Countries with Installed Projects') > -1 &&
+    llms.indexOf('1,900+ Systems Installed') > -1 &&
+    llms.indexOf('Registered Environmental Engineer') > -1);
+  ck('llms.txt has no unconfirmed quick-ship claim', llms.indexOf('quick-ship lead time') === -1);
   const llmsFull = (await call('GET', '/llms-full.txt')).b;
   ck('llms-full.txt includes article body', llmsFull.indexOf('Volatile organic compounds') > -1);
   ck('llms-full.txt includes FAQ answers', llmsFull.indexOf('Q: What does Shandong Yuchuan') > -1);
@@ -181,6 +202,13 @@ function typesOf(ld) {
   console.log('\n=== Public API regression ===');
   const site = JSON.parse((await call('GET', '/api/site')).b);
   ck('api/site company', String(site.settings.companyName).indexOf('Shandong Yuchuan') === 0);
+  ck('api/site real phone', String(site.settings.phone).replace(/\s/g, '') === '+8653183516866');
+  ck('api/site real WhatsApp', String(site.settings.whatsapp).replace(/\s/g, '') === '+8617278827749');
+  ck('api/site founded 2018', String(site.settings.founded) === '2018');
+  ck('api/site real address', /Zhangqiu District/.test(String(site.settings.address)));
+  ck('api/site real credentials',
+    /ISO 9001/.test(String(site.settings.certifications)) &&
+    /Registered Environmental Engineer/.test(String(site.settings.certifications)));
   ck('api/site categories', site.categories.length === 10, String(site.categories.length));
   ck('api/products count', JSON.parse((await call('GET', '/api/products')).b).items.length === 15);
   ck('api/products filter', JSON.parse((await call('GET', '/api/products?category=wet-dust-collectors')).b).items.length === 2);
@@ -221,7 +249,7 @@ function typesOf(ld) {
     Boolean(leadRow) && leadRow.source.utmCampaign === 'q4-export' &&
     leadRow.source.landingPage.indexOf('/products/') === 0);
   ck('honeypot message NOT stored', !(db.inquiries || []).some((i) => i.email === 'bot@example.com'));
-  ck('seed FAQs present', (db.faqs || []).length === 12, String((db.faqs || []).length));
+  ck('seed FAQs present', (db.faqs || []).length === 14, String((db.faqs || []).length));
 
   const csv = await call('GET', '/api/admin/inquiries.csv', undefined, cookie);
   ck('CSV export works', csv.s === 200, 'status ' + csv.s);
@@ -323,7 +351,7 @@ function typesOf(ld) {
   }
   const finalDb = JSON.parse((await call('GET', '/api/admin/data', undefined, cookie)).b);
   ck('final data clean',
-    finalDb.products.length === 15 && finalDb.faqs.length === 12 && finalDb.inquiries.length === 0,
+    finalDb.products.length === 15 && finalDb.faqs.length === 14 && finalDb.inquiries.length === 0,
     'products=' + finalDb.products.length + ' faqs=' + finalDb.faqs.length + ' inquiries=' + finalDb.inquiries.length);
 
   ck('export backup', (await call('GET', '/api/admin/export', undefined, cookie)).s === 200);

@@ -68,16 +68,35 @@ node server.js
 
 > 文章正文允许 HTML，仅管理员可编辑，前台用 `innerHTML` 渲染。不要开放后台账号给不可信人员。
 
-## 上线前必须替换的占位信息
+## 公司信息（已填入真实资料，2026-11-11）
 
-种子数据里的以下字段是**示例值**，请在 后台 → Site Settings 改成真实信息：
-`sales@yuchuan-air.com`、电话、WhatsApp、地址、工作时间、成立年份、认证描述、首页统计数字。
-同时把 **Canonical Site URL** 填成正式域名（例如 `https://yourdomain.com`，不带尾斜杠），
-它决定 canonical 标签、JSON-LD、OG、`robots.txt`、`sitemap.xml` 与 `llms.txt` 里的绝对地址。
+以下真实信息已写入 `data/db.json`（后台 → Site Settings 可随时修改），并在首页、About、
+联系页、隐私页、页脚、Organization JSON-LD 与 `llms.txt` 中保持同一口径：
 
-> 首页统计数字（`12+ 年`、`60+ 国家`、`2,000+ 套`）和认证描述同样是占位值。
-> GEO 引擎会交叉验证事实，编造或前后不一致的数字会显著降低被 AI 引用的概率，请逐项改成可验证的真实信息。
->
+| 字段 | 值 |
+| --- | --- |
+| 电话 | `+86 531 8351 6866` |
+| WhatsApp | `+86 172 7882 7749` |
+| 地址 | Environmental Protection Industrial Park, Zhangqiu District, Jinan, Shandong Province, China |
+| 工作时间 | 08:00 - 21:00 Beijing Time (GMT+8) |
+| 成立年份 | 2018 |
+| 海外安装案例 | 35+ 个国家 |
+| 累计装机量 | 1,900+ 台套 |
+| 资质 | 营业执照 / ISO 9001 / ISO 14001 / CE / 环保注册师 / 设计资质 |
+| 询盘邮箱 | `info@hanxvonfluid.cn` |
+
+原来未经验证的 `12+ 年`、`60+ 国家`、`2,000+ 套`、`72 小时发货` 等占位数字与
+交期承诺已全部删除；示例产品与 FAQ 中的交期统一改为「以报价确认」。GEO 引擎会交叉
+核对多来源事实，请在改后台时保持 About、FAQ、`llms.txt`、LinkedIn 的表述一致。
+
+**上线前仍需补齐**（不影响当前预览与部署）：
+
+1. **Canonical Site URL**：域名定后填 `https://yourdomain.com`（不带尾斜杠），
+   它决定 canonical 标签、JSON-LD、OG、`robots.txt`、`sitemap.xml` 与 `llms.txt` 的绝对地址。
+2. **15 个示例产品的真实型号、参数与实拍图**；6 篇示例文章扩写成真实技术内容。
+3. **1200×630 PNG 分享图**（当前为 SVG 预览图，LinkedIn / WhatsApp 对 SVG 支持不稳定）。
+4. **证书编号 / 扫描件**（如需公开展示）、LinkedIn 等社交主页 URL（`sameAs` 实体信任）。
+
 > 完整的 SEO / GEO 与获客执行表见 **[SEO-GEO.md](./SEO-GEO.md)**，域名绑定步骤见 **[DEPLOY.md 第 13 节](./DEPLOY.md)**。
 
 ## 目录结构
@@ -100,7 +119,7 @@ yuchuan-air/
 │   └── seo.js           # head 注入、JSON-LD、robots / llms / sitemap
 ├── public/              # 前台：8 个页面 + style.css + main.js + favicon / OG 图
 ├── admin/               # 后台：index.html + css + js
-└── tests/e2e.js         # 121 项端到端回归测试
+└── tests/e2e.js         # 152 项端到端回归测试
 ```
 
 ## SEO / GEO 与回归测试

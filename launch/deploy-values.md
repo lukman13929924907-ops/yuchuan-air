@@ -136,6 +136,7 @@ curl -s "$D/robots.txt" | grep -iE "GPTBot|Sitemap"
 
 | 面板 → 字段 | 值 |
 | --- | --- |
+| Site Settings → Company Identity / Contact | ✅ 2026-11-11 已填真实电话、WhatsApp、地址、工作时间、2018、35+、1,900+、资质；只需核对，不需要再填 |
 | Site Settings → SEO & Domain → **Canonical Site URL** | `https://YOUR_DOMAIN` |
 | Site Settings → Search Console → Google / Bing verification | A 表第 3、4 行的 TXT 值 |
 | Site Settings → Social profiles | LinkedIn 公司页等真实 URL（GEO 实体对齐） |
@@ -157,6 +158,7 @@ bash launch/acceptance.sh https://YOUR_DOMAIN
 
 脚本覆盖：页面 / 详情页 / robots / sitemap / llms / 无 JS 也能读到的 SSR 正文 /
 canonical 域名 / 6 个 AI 爬虫 UA / 公开 API 的公司名与产品数 / 密钥泄露检查 /
+真实公司事实（电话、WhatsApp、2018、35+、1,900+、资质）与残留占位检测 /
 隐私政策页 / Cookie 同意脚本 / 安全响应头。
 
 ---

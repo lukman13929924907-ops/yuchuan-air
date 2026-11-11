@@ -41,7 +41,7 @@
 | --- | --- | --- | --- |
 | 1 | **Canonical Site URL** | `siteUrl` | 填 `https://你的域名.com`（无尾斜杠）。它一次性决定 canonical、JSON-LD、sitemap、robots、llms.txt 里的域名。忘填会全部指向预览域名或 IP |
 | 2 | **改管理员密码** | Backup & Security | 见 `README.md` 里的初始密码 |
-| 3 | **替换所有占位信息** | 公司/联系方式 | 邮箱、电话、WhatsApp、地址、工作时间、`founded`、`certifications`、`stats`。**数字必须真实** |
+| 3 | ~~替换所有占位信息~~ ✅ 已完成 | 公司/联系方式 | 2026-11-11 已填真实电话、WhatsApp、地址、工作时间、`founded`、`certifications`、`stats`；如需改动请在后台改，并保持各页面口径一致 |
 | 4 | **上传 1200×630 PNG 分享图** | `ogImage` | 内置 SVG 仅够预览；LinkedIn / WhatsApp / Facebook 对 SVG 支持不稳定 |
 | 5 | **Google / Bing 站长验证码** | `googleSiteVerification`、`bingSiteVerification` | 只填验证码本身，不要整段 meta 标签 |
 | 6 | 公司 Logo | `logoUrl` | 用于 Organization schema，建议 600×60 或正方形 PNG |
@@ -54,7 +54,14 @@
 
 ### 关于「真实数字」的特别提醒
 
-种子数据里的 `12+ Years`、`60+ Countries Served`、`2,000+ Systems Installed`、`72h Quick-Ship`、`ISO 9001 / ISO 14001 / CE` 都是**占位示例**。GEO 引擎会交叉比对多个来源，编造或前后不一致的数字会显著降低被引用概率，也会在 B2B 尽调中变成风险。请逐项改成可验证的事实，并在 About、FAQ、llms.txt、LinkedIn 上保持**完全一致的表述**。
+2026-11-11 已把 `12+ Years`、`60+ Countries Served`、`2,000+ Systems Installed`、`72h Quick-Ship`
+等占位示例全部替换为可验证事实：`2018 年成立`、`35+ 个国家有实际安装案例`、`1,900+ 台套装机量`、
+`08:00–21:00 (GMT+8)`，资质为营业执照 / ISO 9001 / ISO 14001 / CE / 环保注册师 / 设计资质。
+未获确认的「72 小时发货」承诺已从 hero、产品、FAQ、文章中删除，统一改为「交期以报价确认」。
+
+GEO 引擎会交叉比对多个来源，后续在后台改这些数字时，务必在 About、FAQ、`llms.txt`、
+Organization JSON-LD 与 LinkedIn 公司页保持**完全一致的表述**；新增任何业绩数字前请先确认可举证。
+另外，示例产品型号与参数仍是占位，替换时同样不要写入未经验证的性能数据。
 
 ---
 
@@ -99,7 +106,7 @@
 ### 4.2 内容写法（写给 AI，也写给人）
 
 1. **先给结论，再给理由**：每段开头就是可被直接引用的完整句，避免「我们致力于……」这类无信息量表述。
-2. **用数字替代形容词**：`Up to 12,000 CFM / 20,400 m³/h`、`dispatched within 72 hours` 远优于 `high performance`、`fast delivery`。
+2. **用数字替代形容词**：`Up to 12,000 CFM / 20,400 m³/h`、`1,900+ systems installed in 35+ countries` 远优于 `high performance`、`rich experience`。只写有据可查的数字，未确认的交期不要写具体小时数。
 3. **一段只讲一件事**，脱离上下文也能读懂（AI 是按片段检索，不是按整页）。
 4. **多写对比表和「什么时候不该用」**，这类判断性内容最容易被引用。
 5. **全站口径一致**：同一型号的电压、风量、认证在 llms.txt、FAQ、产品页、LinkedIn 上必须一致，矛盾信息会让模型回避引用。
@@ -206,7 +213,7 @@ curl -A "PerplexityBot" https://你的域名.com/llms.txt | head -20
 
 | 阶段 | 动作 | 交付/验收 |
 | --- | --- | --- |
-| **D0–D7 上线** | 买域名 → VPS 部署（见 `DEPLOY.md` 第 13 节）→ HTTPS → 后台填 `siteUrl` → 改密码 → 替换真实公司信息/数字/图片 → 上传 OG 图 → GSC/Bing 验证 → 提交 sitemap → 配 GA4 与 Webhook → 跑 `tests/e2e.js` | `curl -I` 全站 200；canonical 显示正式域名；测试询盘能收到通知 |
+| **D0–D7 上线** | 买域名 → 托管 Node 容器部署（见 `DEPLOY.md` 第 16 节）→ HTTPS → 后台填 `siteUrl` → 改密码 → 公司真实信息/数字已填好 ✅ → 上传真实产品图与 OG 图 → GSC/Bing 验证 → 提交 sitemap → 配 GA4 与 Webhook → 跑 `tests/e2e.js` | `curl -I` 全站 200；canonical 显示正式域名；测试询盘能收到通知 |
 | **D8–D30 内容** | 替换 15 个产品的真实图与参数；新增 4 篇「选型对比/工况」文章；扩写 FAQ 到 20 条；建 LinkedIn 公司页并填 `sameAs`；提交 3–5 个行业目录；录 1 条产品视频 | 每篇新文章有 GSC 展示；llms.txt 反映新内容 |
 | **D31–D60 获客** | 小额 Google Ads 高意图词（带 UTM）；按 GSC 有展示无点击的词优化标题；争取 1–2 个第三方提及；开始月度 GEO 提示词监测 | 后台 Inquiries 出现带 `utm_*` 的真实线索；能说出哪个渠道带来询盘 |
 | **D61–D90 放大** | 放大有转化的词；补客户案例页；按询盘里的真实问题反哺 FAQ 与文章；复测 AI 引用率；建立每周备份（见 `DEPLOY.md` 第 9 节） | 形成「关键词 → 页面 → 渠道 → 询盘 → 报价」可复盘闭环 |
@@ -257,10 +264,10 @@ curl -A "PerplexityBot" https://你的域名.com/llms.txt | head -20
 - **源站位置**：Cloudflare 边缘节点自动就近，但未命中缓存时要回源。英语区把源站放在美西 / 欧洲 / 新加坡（`render.yaml` 默认 `oregon`），不要放国内机房。
 - **关键词用买家口径**：英语区工业买家搜 `welding fume extractor manufacturer`、`cartridge dust collector supplier`、`downdraft table price / quote`，而不是中文直译。第 3 节关键词地图按交易意图分层，优先做 `manufacturer / supplier / quote / specification` 类页面。
 - **单位与合规**：参数同时给公制与英制（CFM / m³/h、inch / mm）；CE、ISO、OSHA、ATEX、NFPA 等表述**只在真实持有时**才写，GEO 引擎会交叉验证，虚假资质会显著降低被引用概率。
-- **响应承诺**：只写 `GMT+8 08:30-18:00` 会让欧美买家犹豫。改成「Reply within 12 hours on business days」并在邮件通知到位后真正做到——询盘 1 小时内回复与隔天回复的成交率差距很大。
+- **工作时间要写买家看得懂的时区**：真实工作时间为 `08:00 - 21:00 Beijing Time (GMT+8)`，即 `00:00–13:00 UTC`（标准时下约为美东 19:00–次日 08:00、中欧 01:00–14:00）。如需额外写「Reply within 12 hours」之类承诺，请先确认团队能稳定做到；邮件通知到位后，1 小时内回复与隔天回复的成交率差距很大。
 - **隐私合规**：面向欧盟 / 英国访客，GA4、Google Ads、Meta Pixel、LinkedIn Insight 需要 Cookie 同意与 Google Consent Mode v2；联系表单旁放隐私政策链接。
 - **第三方背书是 GEO 权重最高的信号**：LinkedIn 公司页、行业目录、协会会员、真实客户案例、可核验的认证编号。在后台 `Social profiles` 填好 `sameAs` 链接，让 AI 能把实体对上号。
-- **别用占位数字**：`12+ 年`、`60+ 国家`、`2,000+ 系统` 目前都是示例。上线前换成真实且各页面口径一致的数字。
+- **别用未经验证的数字**：公司级数字已换成 `2018 / 35+ / 1,900+`，全部有据可查；后续补真实产品型号与参数时，同样不要写入未经验证的性能值或交期。
 
 ---
 

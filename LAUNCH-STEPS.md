@@ -7,7 +7,7 @@
 
 ## 先看结论
 
-网站**代码与部署配置已经 100% 就绪**，本地 git 仓库也已建好（34 个文件，首次提交完成）。
+网站**代码与部署配置已经 100% 就绪**，本地 git 仓库也已建好（39 个文件，首次提交完成）。
 现在缺的不是开发，而是 3 次平台登录授权。
 
 **做完回合 1–3，网站就已经在公网正式运行、能收询盘邮件了** —— 只是网址还是
@@ -16,7 +16,7 @@
 
 | 回合 | 需要登录的平台 | 你要做的动作 | 回我一句 | 能否现在做 |
 | --- | --- | --- | --- | --- |
-| 0 | 无 | 填一张公司信息表 | 见下方模板 | ✅ 立刻 |
+| 0 | 无 | 填一张公司信息表 | ~~见下方模板~~ | ✅ 已完成 2026-11-11 |
 | 1 | GitHub | 建**私有**仓库 + 浏览器授权一次 | 仓库地址 | ✅ 立刻 |
 | 2 | Resend | 建一个 API Key（Key 不用发我） | 注册邮箱 + 发件方式 | ✅ 立刻 |
 | 3 | Render | 导入蓝图 + 粘贴 3 个值 | 源站地址 | ✅ 立刻 |
@@ -37,37 +37,43 @@
 
 ---
 
-## 回合 0｜公司真实信息（无需登录，约 5 分钟）
+## 回合 0｜公司真实信息 ✅ 已完成（2026-11-11）
 
-现在的电话 `+86 531 8899 0666`、WhatsApp、地址、`12+ 年` / `60+ 国家` / `2,000+ 系统`
-全是占位示例。GEO 引擎会交叉验证事实，编造数字会显著降低被 AI 引用概率。
+你给的公司信息表已全部写入 `data/db.json`，并同步到首页、About、联系页、隐私页、页脚、
+Organization JSON-LD、`llms.txt` 与 `llms-full.txt`。
 
-**你要做的**：把下面这张表填好发我（不确定就写「保持现状」，我会保留英文示例并标注待补）：
+| 字段 | 网站上的英文表述 |
+| --- | --- |
+| 电话 | `+86 531 8351 6866`（`tel:` 链接自动去空格） |
+| WhatsApp | `+86 172 7882 7749`（`wa.me` 链接自动取数字） |
+| 地址 | Environmental Protection Industrial Park, Zhangqiu District, Jinan, Shandong Province, China |
+| 工作时间 | 08:00 - 21:00 Beijing Time (GMT+8) |
+| 成立年份 | 2018（首页 `Since 2018`、JSON-LD `foundingDate`、`llms.txt`） |
+| 海外安装案例 | 35+ Countries with Installed Projects |
+| 累计装机量 | 1,900+ Systems Installed |
+| 资质 | Business Licence / ISO 9001 / ISO 14001 / CE / Registered Environmental Engineer / Engineering Design Qualification |
+| 询盘邮箱 | `info@hanxvonfluid.cn` |
 
-```
-回合0完成：
-电话（含国家码）：
-WhatsApp：
-地址（英文，用于页脚与联系页）：
-工作时间（英文，建议写回复承诺而不是 GMT+8）：
-成立年份 / 工程年限：
-出口国家数：
-累计装机量：
-真实资质（ISO / CE 编号；没有就写「删除」）：
-公司一句话英文简介（可选）：
-主推 3–5 款产品型号（可选）：
-主推产品实拍图（可选，直接把图片文件放进 data/uploads/ 并告诉我文件名）：
-```
+**顺手做的三件事实一致性处理**（GEO 引擎会交叉核对，编造数字会显著降低被 AI 引用概率）：
 
-顺手打开预览站看一眼：https://yuchuan-air-export.app.workbuddy.host/?sharecode=IBOWCWOKU6
-版式、产品分类、文章哪里不对，一句话一起告诉我。
+- 首页 4 个统计从 `12+ / 60+ / 2,000+ / 72h` 全部换成可验证的 `2018 / 35+ / 1,900+ / 08:00-21:00`。
+- 删掉未经验证的「Ships in 72 Hours / 72 小时发货」承诺（hero 徽标、分类、产品、FAQ、文章共 6 处），
+  统一改成「交期以报价确认」，避免海外买家按无法兑现的承诺来询盘。
+- 新增 2 条公司事实 FAQ（资质、装机业绩），Organization JSON-LD 补上 `foundingDate`、
+  完整的 `PostalAddress`（城市/省份/国家）和 `hasCredential` 证书数组。
 
-**我接着做**：写进 `data/db.json` → 跑 121 项回归测试 → 重新发布预览 → 再提交一次 git。
-**完成标志**：预览站显示你的真实信息，测试全绿。
+**验证结果**：端到端 152 项 + 邮件 14 项 + 持久卷 5 项 = **171 项全通过**；
+`launch/acceptance.sh` 本地 **49 PASS / 0 FAIL / 2 SKIP**（2 项 SKIP 只在正式 https 域名下才检查）。
+
+**仍可补、但不阻塞上线**：真实产品型号与实拍图、1200×630 PNG 分享图、证书编号/扫描件、
+LinkedIn 公司主页 URL。这些随时可以在后台补，不影响回合 1。
+
+预览站：https://yuchuan-air-export.app.workbuddy.host/?sharecode=IBOWCWOKU6
+（版式、产品分类、文章哪里不对，一句话告诉我即可。）
 
 ---
 
-## 回合 1｜GitHub 私有仓库（约 3 分钟）
+## 回合 1｜GitHub 私有仓库（约 3 分钟）← **现在从这里开始**
 
 **你要做的**：
 
@@ -81,7 +87,7 @@ WhatsApp：
 **我接着做**：配置 remote 并执行 push。
 **这时会弹出浏览器让你登录 GitHub 并点一次 Authorize —— 这一步就是你说的「授权」，点完就不用管了。**
 
-**完成标志**：GitHub 仓库里出现 34 个文件，根目录能看到 `render.yaml`。
+**完成标志**：GitHub 仓库里出现 39 个文件，根目录能看到 `render.yaml`。
 > 如果没弹浏览器而是报权限错，最省事的办法：装 **GitHub Desktop** 登录 →
 > `File → Add Local Repository` → 选 `E:\国内\workbody\2026-11-08-09-03-25\yuchuan-air`
 > → 点 `Publish repository`。全程鼠标，不用命令行。
@@ -133,7 +139,7 @@ WhatsApp：
 
 **我接着做**（远程验证，不用你动手）：
 
-- 跑 `launch/acceptance.sh` 源站版：15 产品 / 6 文章 / 12 FAQ、SSR、canonical、robots、llms.txt
+- 跑 `launch/acceptance.sh` 源站版：15 产品 / 6 文章 / 14 FAQ、SSR、canonical、robots、llms.txt
 - 确认日志出现 `[store] seeded empty data volume from bundled db.json`（空持久卷自动带出完整目录）
 - 打开 `/admin` → `Site Settings` 顶部确认绿色 `Inquiry email is ACTIVE`
 - 提交一条测试询盘，确认 `info@hanxvonfluid.cn` 收到邮件（含 UTM / 来源归因、`Reply-To`=买家邮箱）
@@ -223,5 +229,5 @@ bash launch/acceptance.sh http://127.0.0.1:3211  # 本地自检
 - `README.md`：后台各面板、环境变量、邮件通知说明
 - `SEO-GEO.md`：关键词地图、AI 引用监测、内容计划
 - `render.yaml`：托管部署蓝图；`Dockerfile`：换平台时用
-- `tests/`：139 项端到端 + 14 项邮件 + 5 项持久卷回归测试
+- `tests/`：152 项端到端 + 14 项邮件 + 5 项持久卷回归测试（共 171 项）
 - 已内置的英语区合规：`/privacy` 隐私政策页、Cookie 同意横幅、Consent Mode v2、安全响应头（见 `launch/deploy-values.md` H 段）
