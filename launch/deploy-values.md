@@ -181,11 +181,13 @@ bash launch/acceptance.sh https://YOUR_DOMAIN
 脚本覆盖：页面 / 详情页 / robots / sitemap / llms / 无 JS 也能读到的 SSR 正文 /
 canonical 域名 / 6 个 AI 爬虫 UA / 公开 API 的公司名与产品数 / 密钥泄露检查 /
 真实公司事实（电话、WhatsApp、2018、35+、1,900+、资质）与残留占位检测 /
-隐私政策页 / Cookie 同意脚本 / 安全响应头。
+隐私政策页 / Cookie 同意脚本 / 安全响应头；正式静态站还会自动检查
+`/_data/site.json` 的脱敏与 `no-store`、未登录 `GET /api/admin/data` 返回 401
+（本地 Node 模式自动 SKIP）。
 
-静态版额外人工确认 4 项（脚本不覆盖）：
-`/_routes.json` 只含 `/api/*`；未登录 `GET /api/admin/data` 返回 401；
-后台保存一条内容后约 1 分钟公开页面同步；提交测试询盘后 Gmail 收到带归因的邮件。
+静态版仍需人工确认 3 项（脚本不覆盖）：
+`/_routes.json` 只含 `/api/*`；后台保存一条内容后约 1 分钟公开页面同步；
+提交测试询盘后 Gmail 收到带归因的邮件。
 
 ---
 

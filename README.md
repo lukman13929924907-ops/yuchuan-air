@@ -20,6 +20,8 @@ Render 蓝图要求绑定信用卡（付费实例 + 持久磁盘），因此正�
 - 全部页面在**构建时**由 `scripts/build-static.js` 预渲染成静态 HTML —— SSR 正文、JSON-LD、
   canonical、`robots.txt`、`sitemap.xml`、`llms.txt` 全部保留，爬虫不执行 JS 也能读到完整内容。
 - `dist/_routes.json` 把边缘函数限定在 `/api/*`，静态页面请求免费且无限、无冷启动。
+- `dist/_data/site.json` 是本次构建生成的脱敏内容快照，边缘函数运行时读取它，
+  保证 `/api/*` 与刚发布的 HTML 始终是同一版本；`functions/api/_snapshot.js` 仅作兜底。
 - 后台编辑 → `functions/api/[[path]].js` 把 `data/db.json` 提交到 GitHub → Cloudflare 自动重建，
   **约 1 分钟后**公开页面更新（后台面板里立刻可见）。
 - 询盘存 Cloudflare KV（买家信息不进代码仓库），邮件经 Resend 发出，UTM 归因与 `Reply-To` 保留。

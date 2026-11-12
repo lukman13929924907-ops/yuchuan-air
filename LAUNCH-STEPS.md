@@ -158,6 +158,20 @@ TXT 细节见 `launch/deploy-values.md` B 段（含「SPF 只能有一条、必�
 新方案是静态站 + 同源边缘函数：静态页面请求**免费且无限**，只有 `/api/*` 走 Functions
 （免费额度每天 10 万次）。后台保存 → 写入 GitHub → Cloudflare 自动重建发布。
 
+**我这边已完成的前置（2026-11-12）**：
+
+- 已把静态方案代码推送到 `master`，`git ls-remote origin HEAD` 与本地一致；
+  仓库内已有 `scripts/build-static.js`、`functions/api/[[path]].js`、`.node-version`；
+  `launch/local-secrets.txt` 与 `dist/` 确认**未入库**。
+- 已复核：语法检查通过、38 页 / 75 份 HTML 全量预渲染、243 项测试全通过
+  （152 端到端 + 14 邮件 + 5 持久卷 + 3 管理员密码 + 69 边缘/静态构建）、
+  本地验收 49 PASS / 0 FAIL。
+- 已加固：`dist/_data/site.json` 随每次构建产出，边缘函数运行时读取它，
+  因此公开 `/api/*` 永远与刚发布的 HTML 同一版本，不依赖 Cloudflare 的函数编译顺序。
+- ⚠️ 仓库经 GitHub API 复核仍是 **Public**（`private: false`）。建议顺手在
+  仓库 Settings → Danger Zone 改成 Private；不影响 Pages，只要授权时勾上该仓库。
+  正式站后台密码由 `ADMIN_PASSWORD` 环境变量决定，与仓库里的本地预览密码无关。
+
 ### 3-1 创建 GitHub token（约 2 分钟）
 
 1. GitHub → 头像 → **Settings → Developer settings → Personal access tokens →
