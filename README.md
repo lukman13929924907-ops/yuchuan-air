@@ -5,8 +5,28 @@
 
 > **准备正式上线？按 [LAUNCH-STEPS.md](./LAUNCH-STEPS.md) 一回合一步操作**（只需登录 / 授权 / 粘贴，其余配置与脚本已备好）。
 > 可复制的 DNS / WAF / SSL 配置在 [launch/deploy-values.md](./launch/deploy-values.md)；
-> 一键验收 `bash launch/acceptance.sh https://你的域名`；技术参考看 [DEPLOY.md](./DEPLOY.md) 第 16 节。
+> 一键验收 `bash launch/acceptance.sh https://你的域名`；当前上线方案看 [DEPLOY.md](./DEPLOY.md) 第 17 节。
 > 英语区合规已内置：`/privacy` 政策页、Cookie 同意、Consent Mode v2、安全响应头。
+
+## 两种运行模式（2026-11-12 起）
+
+| 模式 | 用途 | 启动方式 |
+| --- | --- | --- |
+| **A. 本地 / 预览（Node SSR）** | 开发、在线预览、迁移到自有 VPS | `node server.js`；内容写 `data/db.json` 与 `data/uploads/` |
+| **B. 正式上线（Cloudflare Pages 静态）** | 当前上线方案，**免费、无需信用卡、不休眠** | `npm run build` 生成 `dist/`；同源 Pages Function 提供 `/api/*` |
+
+Render 蓝图要求绑定信用卡（付费实例 + 持久磁盘），因此正式上线已改为模式 B。数据流：
+
+- 全部页面在**构建时**由 `scripts/build-static.js` 预渲染成静态 HTML —— SSR 正文、JSON-LD、
+  canonical、`robots.txt`、`sitemap.xml`、`llms.txt` 全部保留，爬虫不执行 JS 也能读到完整内容。
+- `dist/_routes.json` 把边缘函数限定在 `/api/*`，静态页面请求免费且无限、无冷启动。
+- 后台编辑 → `functions/api/[[path]].js` 把 `data/db.json` 提交到 GitHub → Cloudflare 自动重建，
+  **约 1 分钟后**公开页面更新（后台面板里立刻可见）。
+- 询盘存 Cloudflare KV（买家信息不进代码仓库），邮件经 Resend 发出，UTM 归因与 `Reply-To` 保留。
+- `info@hanxvonfluid.cn` 仍是前端客户看到的联系邮箱；通知收件人由服务端 `EMAIL_TO` 决定。
+
+> 操作清单：[LAUNCH-STEPS.md 回合 3](./LAUNCH-STEPS.md)｜技术细节：[DEPLOY.md 第 17 节](./DEPLOY.md)。
+> 旧 `render.yaml` / `Dockerfile` 仅作为付费容器方案的存档，**不要导入**。
 
 ## 为什么这样设计
 
@@ -177,6 +197,12 @@ node tests/store.test.js
 | `DATA_DIR` | 数据目录；**托管平台务必指向项目外的持久卷**（如 `/var/lib/yuchuan`），不要挂到项目内 `data/`，否则种子文件会被卷遮蔽 | `./data` |
 | `FORCE_HTTPS` | 设为 `1`，在 Cloudflare 等反向代理后给 Cookie 加 `Secure` | 关闭 |
 | `EMAIL_PROVIDER` / `EMAIL_API_KEY` / `EMAIL_FROM` / `EMAIL_TO` | 询盘邮件通知，见上一节 | 关闭 |
+
+> **模式 B 用另一组变量**（填在 Cloudflare Pages → Settings → Environment variables）：
+> `ADMIN_PASSWORD`、`SESSION_SECRET`、`GITHUB_TOKEN`、`GITHUB_REPO`、`GITHUB_BRANCH`、
+> `EMAIL_API_KEY`、`EMAIL_FROM`、`EMAIL_TO`、`SITE_URL`、`NODE_VERSION`，
+> 另需把 KV namespace 绑定为 `INQUIRIES`。精确值在 `launch/local-secrets.txt`。
+> 上表的 `PORT` / `HOST` / `DATA_DIR` / `FORCE_HTTPS` 只在模式 A 有效。
 
 ## 数据与迁移要点
 

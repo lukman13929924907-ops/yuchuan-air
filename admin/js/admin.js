@@ -13,7 +13,15 @@
   var panel = 'dashboard';
   var username = '';
   var toastTimer = null;
-  var MAX_UPLOAD_BYTES = 6 * 1024 * 1024;
+  // The static Cloudflare build injects YC_STATIC into /admin/index.html.
+  // GitHub's Contents API caps base64 uploads at ~1 MB; the local Node
+  // server has no such limit. Content edits on Cloudflare are published by
+  // an automatic rebuild, so they appear on the public site ~1 minute later.
+  var STATIC_DEPLOY = typeof window !== 'undefined' && window.YC_STATIC === true;
+  var MAX_UPLOAD_BYTES = STATIC_DEPLOY ? 900 * 1024 : 6 * 1024 * 1024;
+  var SAVE_NOTE = STATIC_DEPLOY
+    ? 'Saved. Cloudflare republishes the public site in about 1 minute.'
+    : 'Changes saved.';
 
   /* ----------------------------- helpers ----------------------------- */
 
@@ -178,7 +186,7 @@
     { key: 'stats', label: 'Homepage Stats', type: 'stats', hint: 'One per line, format:  35+|Countries with Installed Projects . Use verified figures only - AI answer engines cross-check them.' },
     { key: 'footerNote', label: 'Footer Description', type: 'textarea' },
     { section: 'SEO & Domain' },
-    { key: 'siteUrl', label: 'Canonical Site URL', type: 'text', hint: 'REQUIRED before launch: https://yourdomain.com . Fixes canonical tags, JSON-LD, sitemap.xml, robots.txt and llms.txt.' },
+    { key: 'siteUrl', label: 'Canonical Site URL', type: 'text', hint: 'REQUIRED before launch: https://yourdomain.com . Fixes canonical tags, JSON-LD, sitemap.xml, robots.txt and llms.txt. On Cloudflare Pages the build variable SITE_URL takes priority; set both to the same URL.' },
     { key: 'seoTitle', label: 'Default SEO Title', type: 'text' },
     { key: 'seoDescription', label: 'Default SEO Description', type: 'textarea' },
     { key: 'seoKeywords', label: 'SEO Keywords', type: 'text' },
@@ -205,8 +213,8 @@
     { key: 'cookieConsentEnabled', label: 'Require cookie consent before loading analytics', type: 'checkbox', default: true, hint: 'Keep ON for English-speaking / EU / UK markets. Google tags run in Consent Mode v2 (denied by default); Meta and LinkedIn tags are only loaded after the visitor accepts. Turning it OFF may breach GDPR / ePrivacy and limits Google Ads conversion data.' },
     { key: 'privacyUpdatedAt', label: 'Privacy Policy "Last updated" date', type: 'text', hint: 'Shown on /privacy. Update it whenever you change the policy.' },
     { section: 'Lead notifications' },
-    { key: 'inquiryEmail', label: 'Inquiry notification recipient', type: 'text', hint: 'Where new-inquiry emails are delivered (default info@hanxvonfluid.cn). For security the sending credentials are NOT stored here: set EMAIL_PROVIDER / EMAIL_API_KEY / EMAIL_FROM on the server. See DEPLOY.md section 16.4. Verify by submitting one test inquiry.' },
-    { key: 'inquiryWebhook', label: 'Instant inquiry Webhook URL (optional extra channel)', type: 'text', hint: 'Paste a Slack, WeCom, Feishu, DingTalk, Zapier or Make webhook. Every new inquiry is pushed there within seconds, in addition to the email.' }
+    { key: 'inquiryEmail', label: 'Inquiry notification recipient', type: 'text', hint: 'Local Node server: the mailbox that receives new-inquiry emails. On the static Cloudflare site the actual recipient is the server-side EMAIL_TO variable (2A mode = the Resend signup mailbox); this field is kept for documentation. Sending credentials are NEVER stored here. See DEPLOY.md.' },
+    { key: 'inquiryWebhook', label: 'Instant inquiry Webhook URL (optional extra channel)', type: 'text', hint: 'Local Node server: pushes each inquiry to Slack / WeCom / Feishu / DingTalk / Zapier. On the static Cloudflare site use the server-side INQUIRY_WEBHOOK variable instead - webhook URLs are never exposed to browsers.' }
   ];
 
   /* ----------------------------- field rendering ----------------------------- */
@@ -306,7 +314,11 @@
       input.addEventListener('change', function () {
         var file = input.files && input.files[0];
         if (!file) return;
-        if (file.size > MAX_UPLOAD_BYTES) { toast('Image must be smaller than 6 MB.', true); return; }
+        if (file.size > MAX_UPLOAD_BYTES) {
+          toast('Image must be smaller than ' + Math.round(MAX_UPLOAD_BYTES / 1024) + ' KB.' +
+            (STATIC_DEPLOY ? ' Compress it to JPG/WEBP before uploading.' : ''), true);
+          return;
+        }
         var reader = new FileReader();
         reader.onload = function () {
           api('/api/admin/upload', { method: 'POST', body: { dataUrl: String(reader.result) } })
@@ -372,7 +384,7 @@
           closeModal();
           return reload();
         })
-        .then(function () { toast(isNew ? 'Created successfully.' : 'Changes saved.'); })
+        .then(function () { toast(isNew ? 'Created successfully.' : SAVE_NOTE); })
         .catch(function (err) { toast(err.message, true); saveBtn.disabled = false; });
     });
     bindUploads($('#modal-fields'));
@@ -601,7 +613,9 @@
       '<p class="form-status" id="import-status" role="status" aria-live="polite"></p></div>' +
       '<div class="card card-pad" style="margin-bottom:1.2rem">' +
       '<h3 style="font-size:1rem">3 / Change admin password</h3>' +
-      '<p class="small muted">You will be signed out after a successful change.</p>' +
+      '<p class="small muted">' + (STATIC_DEPLOY
+        ? 'Static Cloudflare deployment: the password is a server-side secret. Change ADMIN_PASSWORD in Cloudflare Pages > Settings > Environment variables, then redeploy. Changing it here is not possible.'
+        : 'You will be signed out after a successful change.') + '</p>' +
       '<form id="password-form" style="max-width:420px">' +
       '<div class="form-field"><label for="pw-current">Current Password</label>' +
       '<input id="pw-current" type="password" name="currentPassword" required autocomplete="current-password"></div>' +
@@ -764,7 +778,9 @@
         api('/api/admin/settings', { method: 'PUT', body: payload })
           .then(function () { return reload(); })
           .then(function () {
-            if (status) { status.className = 'form-status is-ok'; status.textContent = 'Settings saved and live on the website.'; }
+            if (status) { status.className = 'form-status is-ok'; status.textContent = STATIC_DEPLOY
+              ? 'Settings saved. The public site refreshes in about 1 minute.'
+              : 'Settings saved and live on the website.'; }
             toast('Settings saved.');
           })
           .catch(function (err) {
@@ -807,6 +823,11 @@
       passwordForm.addEventListener('submit', function (event) {
         event.preventDefault();
         var status = $('#password-status');
+        if (STATIC_DEPLOY) {
+          status.className = 'form-status is-error';
+          status.textContent = '请在 Cloudflare Pages → Settings → Environment variables 修改 ADMIN_PASSWORD 并重新部署。';
+          return;
+        }
         api('/api/admin/password', {
           method: 'POST',
           body: {

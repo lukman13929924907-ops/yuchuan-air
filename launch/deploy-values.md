@@ -1,28 +1,35 @@
 # 可直接复制的部署配置包
 
-> 用途：回合 4–6（域名 / Cloudflare / 站长验证）时照抄。
-> 现在只需占位，等域名与源站地址确定后，我会把 `YOUR_DOMAIN` / `ORIGIN_HOST` 全部替换成真实值再给你。
+> **2026-11-12 更新**：正式上线已改为 **Cloudflare Pages 静态方案**（免费、免信用卡），
+> **不再有「源站」概念**，也不用 CNAME 回源到任何服务器。
+> 回合 3 的全部环境变量精确值在 `launch/local-secrets.txt`，步骤见 `LAUNCH-STEPS.md` 回合 3；
+> 本文件现在只用于回合 4–6 的域名绑定、WAF 放行与站长验证。
 >
 > - `YOUR_DOMAIN` = 你在阿里云买的域名，例如 `yuchuanair.com`
-> - `ORIGIN_HOST` = Render 给你的源站地址，例如 `yuchuan-air.onrender.com`
-> - `SALES_MAILBOX` = `info@hanxvonfluid.cn`（已全站生效）
+> - `PAGES_HOST` = Cloudflare 给的项目地址，例如 `yuchuan-air.pages.dev`
+> - `SALES_MAILBOX` = `info@hanxvonfluid.cn`（前端客户看到的联系邮箱）
 
 ---
 
-## A. Cloudflare DNS 记录（回合 5 用）
+## A. 绑定自定义域名到 Pages 项目（回合 5 用）
 
-进入 Cloudflare → 选域名 → **DNS → Records → Add record**。
+**不用手动加回源 A/CNAME 记录**：打开回合 3 建好的 Cloudflare Pages 项目 →
+**Custom domains → Add custom domain** → 填 `YOUR_DOMAIN`，
+Cloudflare 会**自动创建 CNAME 并签发免费 HTTPS 证书**。
+域名在同一个 Cloudflare 账号下时，DNS 记录会自动出现在 DNS → Records，保持橙云代理即可。
 
 | # | Type | Name | Content | Proxy status | 说明 |
 | --- | --- | --- | --- | --- | --- |
-| 1 | CNAME | `@` | `ORIGIN_HOST` | **Proxied（橙云）** | Cloudflare 会自动做 CNAME Flattening，根域名可用 |
-| 2 | CNAME | `www` | `ORIGIN_HOST` | **Proxied（橙云）** | 之后用 Page Rule / Redirect Rule 把 www 301 到主域 |
+| 1 | CNAME | `@` | 由 Pages 自动创建 | Proxied | **不要手填**，也不要改成 A 记录 |
+| 2 | CNAME | `www` | 同项目再加一个 `www.YOUR_DOMAIN` custom domain | Proxied | 用 Redirect Rules 把 www 301 到主域 |
 | 3 | TXT | `@` | `google-site-verification=XXXXXXXX` | DNS only | 值来自 Google Search Console，回合 6 |
 | 4 | TXT | `@` | `Bing 给的验证值` | DNS only | 值来自 Bing Webmaster，回合 6 |
 | 5 | TXT | `resend._domainkey` | `Resend 提供的 DKIM 值` | DNS only | 仅发件方式 2B 需要（见 B） |
 | 6 | TXT | `_dmarc` | `v=DMARC1; p=none; rua=mailto:SALES_MAILBOX` | DNS only | 建议在域名接入稳定后再加 |
 
-**不要在 Cloudflare 里加 A 记录指向 IP**：Render 的源站 IP 会变，用 CNAME 指向主机名才稳。
+绑定完成后，把 Cloudflare 环境变量 `SITE_URL` 与后台 `Canonical Site URL`
+**同时**改成 `https://YOUR_DOMAIN`，并重新部署一次，让 canonical / sitemap / llms.txt 全部换新地址。
+静态站由 Cloudflare 边缘直接托管，**不需要 `Full (strict)` 回源设置**。
 
 ---
 
@@ -47,15 +54,14 @@
 2. 把 Resend 给出的 DKIM / SPF TXT 记录，加到**管理 `hanxvonfluid.cn` 解析的那个平台**
    （可能是阿里云云解析、腾讯 DNSPod 或邮箱服务商后台，取决于你们企业邮箱托管在哪）
 3. **只加 TXT，绝对不要改 MX 记录** —— 否则现有企业邮箱会收不到信
-4. 等 Resend 显示 `Verified`，然后改这 **2 处**：
+4. 等 Resend 显示 `Verified`，改 Cloudflare Pages 的 **2 个变量**并重新部署：
    ```
-   Render 环境变量 EMAIL_FROM = Yuchuan Air <noreply@hanxvonfluid.cn>
-   后台 Site Settings → Inquiry notification recipient = info@hanxvonfluid.cn
+   EMAIL_FROM = Yuchuan Air <noreply@hanxvonfluid.cn>
+   EMAIL_TO   = info@hanxvonfluid.cn
    ```
-   `render.yaml` 里的 `EMAIL_TO` 本来就是 `info@hanxvonfluid.cn`，不用动。
-   ⚠️ **后台字段优先级高于 `EMAIL_TO`**（见 `lib/mailer.js` 的 `recipient()`）：
-   只改 Render 变量不会生效，漏掉后台这一处会继续发到 Gmail，或用测试发件人时被 403 拒绝。
-5. 提交一条测试询盘，看服务端日志 `[mailer] inquiry email sent to info@hanxvonfluid.cn`
+   静态版直接读服务端变量，**不需要再改后台字段** —— 旧 Node 版
+   `lib/mailer.js recipient()` 里「后台字段覆盖 `EMAIL_TO`」的陷阱已在边缘函数中消除。
+5. 提交一条测试询盘，确认企业邮箱收到（含 UTM 归因、`Reply-To` = 买家邮箱）
 
 > ⚠️ **SPF 常见错误**：一个域名只能有**一条** SPF TXT 记录。如果 `hanxvonfluid.cn`
 > 已有 `v=spf1 ...`，要把 `include:resend.com` **合并进现有那条**，
@@ -71,12 +77,12 @@
 
 | 位置 | 设置 |
 | --- | --- |
-| SSL/TLS → Overview | **Full (strict)**（源站有 Render 签发的有效证书） |
+| SSL/TLS → Overview | 保持默认；Pages 自定义域名由 Cloudflare 自动签发证书，**没有回源** |
 | SSL/TLS → Edge Certificates → Always Use HTTPS | **On** |
-| SSL/TLS → Edge Certificates → HSTS | **保持 Off** —— 源站已发 HSTS 头，重复开启会出现两个同名头 |
+| SSL/TLS → Edge Certificates → HSTS | **保持 Off** —— `dist/_headers` 已发 HSTS 头，重复会出现两个同名头 |
 | SSL/TLS → Origin Server | 不需要 Origin Certificate / 不需要 certbot |
 | Rules → Redirect Rules | `www.YOUR_DOMAIN` → 301 → `https://YOUR_DOMAIN/$1` |
-| Render → Settings → Custom Domains | 也把 `YOUR_DOMAIN` 和 `www.YOUR_DOMAIN` 加进去，否则 Host 头不匹配 |
+| Pages 项目 → Custom domains | 添加 `YOUR_DOMAIN` 与 `www.YOUR_DOMAIN`（这一步本身就是域名绑定） |
 
 **证书不用买、不用手动续期**：Cloudflare Universal SSL 免费且自动续期。
 
@@ -157,10 +163,11 @@ curl -s "$D/robots.txt" | grep -iE "GPTBot|Sitemap"
 | Site Settings → Social profiles | LinkedIn 公司页等真实 URL（GEO 实体对齐） |
 | Site Settings → Analytics | GA4 / GTM / Ads / Meta / LinkedIn ID（**填了才会触发 Cookie 同意机制**） |
 | Site Settings → Privacy & compliance | `cookieConsentEnabled` 保持 ON；`privacyUpdatedAt` 改政策时同步更新 |
-| Site Settings → Lead notifications | `inquiryEmail = info@hanxvonfluid.cn` |
+| Site Settings → Lead notifications | 静态版仅作文档；实际收件人由 Cloudflare 的 `EMAIL_TO` 决定（2A = Gmail） |
 
-改完 `Canonical Site URL` 后，全站 canonical、JSON-LD、robots.txt、sitemap.xml、
-llms.txt 会**立即**用新域名，无需重启、无需改代码。
+改完 `Canonical Site URL` 后，把 Cloudflare 环境变量 `SITE_URL` 也改成同一个值并重新部署；
+重建后全站 canonical、JSON-LD、robots.txt、sitemap.xml、llms.txt 会统一用新域名。
+后台面板里立刻可见，公开页面约 1 分钟后刷新。
 
 ---
 
@@ -175,6 +182,10 @@ bash launch/acceptance.sh https://YOUR_DOMAIN
 canonical 域名 / 6 个 AI 爬虫 UA / 公开 API 的公司名与产品数 / 密钥泄露检查 /
 真实公司事实（电话、WhatsApp、2018、35+、1,900+、资质）与残留占位检测 /
 隐私政策页 / Cookie 同意脚本 / 安全响应头。
+
+静态版额外人工确认 4 项（脚本不覆盖）：
+`/_routes.json` 只含 `/api/*`；未登录 `GET /api/admin/data` 返回 401；
+后台保存一条内容后约 1 分钟公开页面同步；提交测试询盘后 Gmail 收到带归因的邮件。
 
 ---
 

@@ -261,7 +261,7 @@ curl -A "PerplexityBot" https://你的域名.com/llms.txt | head -20
 
 目标市场确定为英语区后，下面几项比「多发几篇文章」更影响转化与 AI 引用：
 
-- **源站位置**：Cloudflare 边缘节点自动就近，但未命中缓存时要回源。英语区把源站放在美西 / 欧洲 / 新加坡（`render.yaml` 默认 `oregon`），不要放国内机房。
+- **托管位置**：当前正式站是 Cloudflare Pages 静态站，页面由全球边缘节点直接分发，**没有回源服务器、没有区域选择、没有冷启动**，英语区各市场延迟都低。旧 `render.yaml` 的 `region: oregon` 仅属已废弃的容器方案存档。
 - **关键词用买家口径**：英语区工业买家搜 `welding fume extractor manufacturer`、`cartridge dust collector supplier`、`downdraft table price / quote`，而不是中文直译。第 3 节关键词地图按交易意图分层，优先做 `manufacturer / supplier / quote / specification` 类页面。
 - **单位与合规**：参数同时给公制与英制（CFM / m³/h、inch / mm）；CE、ISO、OSHA、ATEX、NFPA 等表述**只在真实持有时**才写，GEO 引擎会交叉验证，虚假资质会显著降低被引用概率。
 - **工作时间要写买家看得懂的时区**：真实工作时间为 `08:00 - 21:00 Beijing Time (GMT+8)`，即 `00:00–13:00 UTC`（标准时下约为美东 19:00–次日 08:00、中欧 01:00–14:00）。如需额外写「Reply within 12 hours」之类承诺，请先确认团队能稳定做到；邮件通知到位后，1 小时内回复与隔天回复的成交率差距很大。

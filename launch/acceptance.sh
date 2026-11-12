@@ -144,7 +144,38 @@ case "$HOME_HTML$ABOUT_HTML$LLMS" in *'8899 0666'*|*'8888 0666'*|*'12+'*|*'60+'*
   ck 'no leftover placeholder phone / stats / delivery claim' 0;;
   *) ck 'no leftover placeholder phone / stats / delivery claim' 1;; esac
 echo 'NOTE  check /admin -> Site Settings top banner shows "Inquiry email is ACTIVE"'
-echo 'NOTE  submit one test inquiry, then confirm delivery to info@hanxvonfluid.cn and delete it'
+echo 'NOTE  submit one test inquiry, then confirm delivery to lukman13929924907@gmail.com (2A) and delete it'
+
+echo
+echo '--- 10. Cloudflare Pages static-mode checks ---'
+DATA_CODE=$(code "$D/_data/site.json")
+if [ "$DATA_CODE" != "200" ]; then
+  sk 'static content asset checks (local Node / preview mode only)'
+else
+  DATA_JSON=$(curl -s --max-time 20 "$D/_data/site.json")
+  DATA_OK=$(printf '%s' "$DATA_JSON" | node -e '
+let s=""; process.stdin.on("data",d=>s+=d).on("end",()=>{
+  try {
+    const j=JSON.parse(s);
+    console.log(JSON.stringify({
+      noPii:Array.isArray(j.inquiries)&&j.inquiries.length===0,
+      noWebhook:!(j.settings&&"inquiryWebhook" in j.settings),
+      sameCompany:String(j.settings&&j.settings.companyName||"").indexOf("Shandong Yuchuan")===0,
+      sameProducts:Array.isArray(j.products)&&j.products.length===15
+    }));
+  } catch(e) { console.log("{}"); }
+});')
+  for key in noPii noWebhook sameCompany sameProducts; do
+    case "$DATA_OK" in *"\"$key\":true"*) ck "content asset: $key" 1;; *) ck "content asset: $key" 0;; esac
+  done
+  DATA_HDRS=$(curl -s -D - -o /dev/null --max-time 20 "$D/_data/site.json")
+  if printf '%s' "$DATA_HDRS" | grep -qi 'cache-control:.*no-store'; then
+    ck 'content asset is no-store' 1
+  else
+    ck 'content asset is no-store' 0
+  fi
+  c=$(code "$D/api/admin/data"); [ "$c" = "401" ] && ck "anonymous /api/admin/data is 401 ($c)" 1 || ck "anonymous /api/admin/data is 401 ($c)" 0
+fi
 
 printf '\n============================================================\n'
 printf ' RESULT  pass=%s  fail=%s  skip=%s\n' "$PASS" "$FAIL" "$SKIP"

@@ -1,3 +1,14 @@
+# ---------------------------------------------------------------------------
+# DEPRECATED / NOT USED BY THE CURRENT LAUNCH PLAN (2026-11-12)
+#
+# Render requires a payment method for the paid Starter plan + persistent disk
+# that this blueprint declares. The site now ships as a pre-rendered static
+# site on Cloudflare Pages with a same-origin Pages Function (no credit card,
+# no server, no spin-down). See DEPLOY.md section 17 and LAUNCH-STEPS.md.
+#
+# This file is kept only as a fallback for a future paid-container migration.
+# Do NOT import it as a Blueprint unless you intentionally choose that path.
+# ---------------------------------------------------------------------------
 # Render Blueprint - one-click deploy for the "Cloudflare + managed Node" path.
 # Docs: https://render.com/docs/blueprint-spec
 #

@@ -7,30 +7,37 @@
 
 ## 先看结论
 
-网站**代码与部署配置已经 100% 就绪**，本地 git 仓库已建好并已推送到 GitHub 私有仓库
-（39 个文件）。现在缺的不是开发，而是最后 **1 次平台登录授权（Render）**。
+**2026-11-12 方案变更**：Render 导入蓝图时要求**绑定信用卡**（付费 Starter 实例 + 1GB 持久磁盘）。
+按你的要求，已改为 **Cloudflare Pages 静态站 + 同源 Pages Function**：
+**免费、不需要信用卡、没有服务器、不会休眠、`robots.txt` 永远正常**；
+SSR 正文、JSON-LD、llms.txt、在线后台、询盘邮件与 UTM 归因全部保留。
 
-**做完回合 3，网站就已经在公网正式运行、能收询盘邮件了** —— 只是网址还是
-`xxx.onrender.com`。域名（你说的"最后绑定"）只是最后换门牌，不需要重做网站，
-`Canonical Site URL` 在后台改一次，全站 canonical / sitemap / llms.txt / JSON-LD 会自动跟着变。
+代码与部署配置已 100% 就绪，并已推送到 GitHub 仓库 `master`。现在缺的只是 **2 次平台授权**：
+Cloudflare 账号登录，以及新建一个 GitHub token。做完回合 3，网站就在公网正式运行，
+网址是 `xxx.pages.dev`；域名（你说最后绑定）只是最后换门牌。
 
 | 回合 | 需要登录的平台 | 你要做的动作 | 回我一句 | 能否现在做 |
 | --- | --- | --- | --- | --- |
-| 0 | 无 | 填一张公司信息表 | ~~见下方模板~~ | ✅ 已完成 2026-11-11 |
-| 1 | GitHub | 建**私有**仓库 + 提供地址 | ~~仓库地址~~ | ✅ 已完成 2026-11-11 |
+| 0 | 无 | ~~填一张公司信息表~~ | — | ✅ 已完成 2026-11-11 |
+| 1 | GitHub | ~~建仓库 + 提供地址~~ | — | ✅ 已完成 2026-11-11 |
 | 2 | Resend | ~~建 API Key + 回我注册邮箱 / 方式~~ | — | ✅ 已完成，2A 定案 |
-| 3 | Render | 导入蓝图 + 粘贴 3 个值 | 源站地址 | ✅ **现在从这里开始** |
+| 3 | Cloudflare + GitHub | 建 KV、建 token、建 Pages 项目并粘变量 | `回合3完成：https://xxx.pages.dev` | ✅ **现在从这里开始** |
 | 4 | 阿里云 | 买域名 | 域名 | ⏸ 最后 |
-| 5 | Cloudflare | 改 NS + 加我给的记录 | NS 已改 | ⏸ 最后 |
+| 5 | Cloudflare | 在**已有** Cloudflare 里加域名并绑到 Pages 项目 | NS 已改 | ⏸ 最后 |
 | 6 | Google / Bing | 站长验证授权 | 验证完成 | ⏸ 最后 |
+
+> ⚠️ 检测到 GitHub 仓库 `lukman13929924907-ops/yuchuan-air` 目前是 **Public**。
+> 建议先到仓库 **Settings → Danger Zone → Change visibility → Make private**
+> （不影响 Cloudflare 部署，只要回合 3 授权 GitHub 时勾上这个仓库）。
 
 ---
 
 ## 三条铁律
 
 1. **敏感值只粘到平台控制台，永远不要发到聊天窗口、截图或公开仓库**：
-   `ADMIN_PASSWORD`、`EMAIL_API_KEY`、GitHub token。它们已写在本地
-   `launch/local-secrets.txt`（该文件已被 `.gitignore` 忽略，不会推到 GitHub）。
+   `ADMIN_PASSWORD`、`SESSION_SECRET`、`EMAIL_API_KEY`、GitHub token。
+   除 GitHub token 需你自己在回合 3 生成外，其余都在本地 `launch/local-secrets.txt`
+   （该文件已被 `.gitignore` 忽略，不会推到 GitHub）。
 2. **每回合只做当前回合**，做完回我一句固定格式：`回合N完成：<值>`。
    我会做完该回合剩下的所有事，验证通过后才给你下一回合。
 3. **卡住就停**，把控制台的报错文字发我（截图请先遮住 Key），不要反复重试或改配置。
@@ -86,7 +93,9 @@ LinkedIn 公司主页 URL。这些随时可以在后台补，不影响回合 1�
 - 在线预览已按你的授权重新发布（覆盖原链接）：首页、`/llms.txt`、`/api/site` 均返回 200，
   真实电话 / WhatsApp / 地址 / 2018 / 35+ / 1,900+ / 资质全部可见，无残留占位。
 
-**完成标志已达成**：私有仓库根目录能看到 `render.yaml`，39 个文件齐全。
+**完成标志已达成**：仓库根目录能看到 `render.yaml`（旧方案存档）与 `scripts/build-static.js`、
+`functions/api/[[path]].js`（当前方案）。⚠️ 2026-11-12 检测发现该仓库实际是 **Public**，
+建议改为 Private（见结论段提醒）。
 
 ---
 
@@ -118,10 +127,9 @@ please verify a domain at resend.com/domains ...
 所以 **2A 阶段询盘发到 `lukman13929924907@gmail.com`** —— 仍是你自己的邮箱、一条不丢
 （同时存进后台 `Inquiries`），只是暂时不在企业邮箱。要直达 `info@hanxvonfluid.cn` 必须切 **2B**。
 
-> 另一个已查明的优先级陷阱：`lib/mailer.js` 的 `recipient()` 里，
-> **后台 `Site Settings → Inquiry notification recipient` 会覆盖 `render.yaml` 的 `EMAIL_TO`**。
-> 种子值是 `info@hanxvonfluid.cn`，所以只改 Render 变量没用，2A 阶段这个后台字段也必须改成
-> Gmail —— **回合 3 上线后我用管理员接口代改，不用你动手。**
+> **旧 Node 版的优先级陷阱（静态版已消除）**：`lib/mailer.js` 的 `recipient()` 里，
+> 后台 `Inquiry notification recipient` 会覆盖 `EMAIL_TO`。新的 Cloudflare Pages Function
+> 直接读服务端 `EMAIL_TO` 变量，后台那个字段仅作文档用途，**不需要再代改，也不会踩 403**。
 
 ### 切 2B（想让询盘直达企业邮箱时随时可切，不用等新域名）
 
@@ -129,9 +137,10 @@ please verify a domain at resend.com/domains ...
    （这把 Key 仅发信权限、读不了域名接口，需要你在控制台点一下，把页面给出的 TXT 值发我）
 2. 我逐条给你 TXT 精确值 → 你在管理 `hanxvonfluid.cn` 解析的平台加记录
    （**只加 TXT，绝对不动 MX**，不影响现有企业邮箱收发）
-3. Resend 显示 `Verified` 后我改 2 处：`EMAIL_FROM` → `Yuchuan Air <noreply@hanxvonfluid.cn>`、
-   后台通知收件人 → `info@hanxvonfluid.cn`；`render.yaml` 的 `EMAIL_TO` 本来就是企业邮箱，不用动
-4. 提交测试询盘，确认日志 `[mailer] inquiry email sent to info@hanxvonfluid.cn`
+3. Resend 显示 `Verified` 后改 Cloudflare 的 2 个变量：
+   `EMAIL_FROM` → `Yuchuan Air <noreply@hanxvonfluid.cn>`、
+   `EMAIL_TO` → `info@hanxvonfluid.cn`（静态版不再需要改后台字段），然后重新部署
+4. 提交一条测试询盘，确认企业邮箱收到
 
 TXT 细节见 `launch/deploy-values.md` B 段（含「SPF 只能有一条、必须合并」的坑）。
 
@@ -143,43 +152,89 @@ TXT 细节见 `launch/deploy-values.md` B 段（含「SPF 只能有一条、必�
 
 ---
 
-## 回合 3｜Render 部署（约 8 分钟）← **现在从这里开始，做完网站就上线了**
+## 回合 3｜Cloudflare Pages 部署（约 10 分钟）← **现在从这里开始，做完网站就上线了**
 
-**你要做的**：
+**为什么换**：Render 蓝图要求绑定信用卡（付费 Starter + 持久磁盘）。
+新方案是静态站 + 同源边缘函数：静态页面请求**免费且无限**，只有 `/api/*` 走 Functions
+（免费额度每天 10 万次）。后台保存 → 写入 GitHub → Cloudflare 自动重建发布。
 
-1. 登录 Render → **New** → **Blueprint** → 连接 GitHub 并**授权** → 选 `yuchuan-air`
-2. 页面会自动读根目录 `render.yaml`：一个 Web Service + 1 GB 持久盘（挂 `/var/lib/yuchuan`）
-3. 出现 3 个 `sync: false` 变量框，从本地 `launch/local-secrets.txt` 复制粘贴：
+### 3-1 创建 GitHub token（约 2 分钟）
 
-   | 变量 | 精确值（可直接照抄） |
+1. GitHub → 头像 → **Settings → Developer settings → Personal access tokens →
+   Fine-grained tokens → Generate new token**
+2. Token name `yuchuan-pages`；Expiration 选 `No expiration` 或 90 天
+3. **Repository access → Only select repositories** → 勾 `lukman13929924907-ops/yuchuan-air`
+4. **Permissions → Repository permissions → Contents: Read and Write**
+   （Metadata: Read-only 会自动带上）
+5. Generate → 复制 `github_pat_...`
+   ⚠️ **只粘到 Cloudflare 的 `GITHUB_TOKEN` 变量框，不要发我、不要发聊天窗口。**
+
+### 3-2 创建 KV 命名空间（约 1 分钟）
+
+登录 **https://dash.cloudflare.com**（免费账号只需邮箱，**不需要信用卡**）
+→ 左侧 **Workers & Pages → KV → Create a namespace**
+→ 名称填 `yuchuan-inquiries` → Add。
+
+> KV 用来存询盘（买家信息不进代码仓库）。不接也能收到询盘邮件，
+> 但后台 Inquiries 列表不会保存记录，所以这一步别漏。
+
+### 3-3 创建 Pages 项目（约 5 分钟）
+
+1. **Workers & Pages → Create → Pages → Connect to Git**
+2. 选 **GitHub** → 点授权，账号选 `lukman13929924907-ops`，仓库勾 `yuchuan-air`
+   （私有仓库必须显式勾选，否则列表里看不到）→ 确认
+3. 选中 `yuchuan-air` → **Begin setup**，逐项填：
+
+   | 字段 | 值 |
    | --- | --- |
-   | `ADMIN_PASSWORD` | `launch/local-secrets.txt` 里的 19 位强密码（正式站后台登录密码；2026-11-11 修复后**真正生效**） |
-   | `EMAIL_API_KEY` | `launch/local-secrets.txt` 里的 `re_...`（已实测可用） |
-   | `EMAIL_FROM` | `onboarding@resend.dev` ← 方式 2A 的最终确定值 |
+   | Project name | `yuchuan-air`（决定 `https://yuchuan-air.pages.dev`） |
+   | Production branch | `master` |
+   | Framework preset | `None` |
+   | Build command | `node scripts/build-static.js` |
+   | Build output directory | `dist` |
+   | Root directory | `/` |
 
-   其余 `EMAIL_PROVIDER`、`EMAIL_TO`、`DATA_DIR`、`FORCE_HTTPS`、`NODE_VERSION`
-   已写在 `render.yaml` 里，不用填。
-   > ⚠️ 若你已切 2B，把 `EMAIL_FROM` 换成 `Yuchuan Air <noreply@hanxvonfluid.cn>` 即可。
-4. 点 **Apply / Deploy**，等状态变 `Live`
+4. 展开 **Environment variables**，逐个 Add（精确值在 `launch/local-secrets.txt`）：
 
-**回我一句**：`回合3完成：https://xxx.onrender.com`
+   | 变量 | 值 |
+   | --- | --- |
+   | `ADMIN_PASSWORD` | 文件里的 19 位强密码（正式站后台登录密码） |
+   | `SESSION_SECRET` | 文件里 2026-11-12 新增的会话签名串 |
+   | `GITHUB_TOKEN` | 3-1 生成的 `github_pat_...` |
+   | `GITHUB_REPO` | `lukman13929924907-ops/yuchuan-air` |
+   | `GITHUB_BRANCH` | `master` |
+   | `EMAIL_API_KEY` | 文件里的 `re_...` |
+   | `EMAIL_FROM` | `onboarding@resend.dev` |
+   | `EMAIL_TO` | `lukman13929924907@gmail.com` |
+   | `SITE_URL` | `https://yuchuan-air.pages.dev`（项目名不同就换成实际地址） |
+   | `NODE_VERSION` | `22` |
+
+5. 点 **Save and Deploy**，等第一次构建状态变 `Live`
+6. 部署完成后：项目 → **Settings → Functions → KV namespace bindings → Add binding**
+   → Variable name 填 `INQUIRIES` → 选 `yuchuan-inquiries` → Save
+   → 回 **Deployments** 对最近一次部署点 **Retry deployment**，让绑定生效。
+
+**回我一句**：`回合3完成：https://xxx.pages.dev`
 
 **我接着做**（远程验证，不用你动手）：
 
-- 跑 `launch/acceptance.sh` 源站版：15 产品 / 6 文章 / 14 FAQ、SSR、canonical、robots、llms.txt
-- 确认日志出现 `[store] seeded empty data volume from bundled db.json`（空持久卷自动带出完整目录）
-- **把后台 `Inquiry notification recipient` 从 `info@hanxvonfluid.cn` 改成 `lukman13929924907@gmail.com`**
-  （2A 必需；它的优先级高于 `EMAIL_TO`，不改的话发信会被 Resend 403 拒绝）
-- 打开 `/admin` → `Site Settings` 顶部确认绿色 `Inquiry email is ACTIVE`
-- 提交一条测试询盘，确认 `lukman13929924907@gmail.com` 收到邮件（含 UTM / 来源归因、`Reply-To`=买家邮箱）
-- 删掉测试询盘，交付一份验收结果
+- 跑 `launch/acceptance.sh`：SSR 正文、canonical、robots 放行 AI 爬虫、sitemap、
+  llms.txt、隐私页、安全头、真实公司信息、6 个爬虫 UA
+- 额外验收静态版特有项：`/_routes.json` 只放行 `/api/*`、`/_data/site.json` 与 `/api/site` 同版本、
+  `no-store` 生效、同源 `/api/site` 可读、未登录 `/api/admin/data` 返回 401、后台登录与内容读取正常
+- 提交一条测试询盘 → 确认 Gmail 收到（含 UTM 来源归因、`Reply-To` = 买家邮箱）→ 后台删掉测试记录
+- 交付一份验收结果
 
-**完成标志**：**网站已在公网运行、后台能改产品文章、询盘邮件能收到**（2A 到 Gmail，切 2B 后到企业邮箱）。
-此时可以先开始投内容、跑小额广告；域名只是最后换网址。
+**完成标志**：网站已在公网运行，后台能改产品/文章，询盘邮件能收到，
+**全程零费用、零信用卡、零休眠**。此时可以先投内容、跑小额广告；域名只是最后换网址。
 
-> 技术约束（已替你处理）：Cloudflare 的 DNS/SSL/WAF 只是边缘反代，不跑 Node、不存文件，
-> 所以必须有一个带持久磁盘的 Node 容器回源。持久卷挂在项目外的 `/var/lib/yuchuan`，
-> **绝不能挂到 `/app/data`** —— 卷会遮住镜像内自带的种子 `db.json`，导致上线是空站。
+### 回合 3 之后的行为变化（请记住）
+
+- 后台保存后**数据立刻写入 GitHub**，公开页面由 Cloudflare 自动重建，约 **1 分钟**后刷新；
+  后台面板里立刻能看到新内容。
+- 图片上传上限 **900 KB**（GitHub 接口限制），建议先压成 JPG / WEBP。
+- 改管理员密码请改 Cloudflare 的 `ADMIN_PASSWORD` 变量并重新部署，后台面板里改不了。
+- `info@hanxvonfluid.cn` 仍是前端客户看到的联系邮箱；询盘通知按 2A 发到 Gmail。
 
 ---
 
@@ -195,24 +250,29 @@ TXT 细节见 `launch/deploy-values.md` B 段（含「SPF 只能有一条、必�
 
 ---
 
-## 回合 5｜Cloudflare 接入（约 10 分钟）
+## 回合 5｜绑定自定义域名（约 10 分钟）
+
+> 前提：域名已在阿里云买好（回合 4），Cloudflare 账号已在回合 3 建好。
+> **静态 Pages 不需要「回源」**：不用 CNAME 指向任何服务器、不用配 `Full (strict)`、
+> 不用买证书，Cloudflare 在边缘直接托管页面并自动签发 HTTPS 证书。
 
 **你要做的**：
 
 1. 登录 Cloudflare → **Add a site** → 输入域名 → 选 **Free** 计划
-2. Cloudflare 给出两个 nameserver（如 `xxx.ns.cloudflare.com`）
-3. 到阿里云域名控制台 → **修改 DNS 服务器** → 填这两个 NS → 保存
-4. 回 Cloudflare 点 **Done, check nameservers**（生效可能要几分钟到几小时）
+2. Cloudflare 给出两个 nameserver → 到阿里云域名控制台 → **修改 DNS 服务器** → 填这两个 NS → 保存
+3. 回 Cloudflare 点 **Done, check nameservers**（生效几分钟到几小时）
 
 **回我一句**：`回合5完成：NS 已改`
 
-**我接着做**：把 **`launch/deploy-values.md`** 里的 `YOUR_DOMAIN` / `ORIGIN_HOST` 全部换成你的真实值再给你。该文件已预置好完整记录表（@ / www CNAME、Resend DKIM/SPF/DMARC TXT、GSC/Bing 验证 TXT）、WAF 放行表达式、SSL 设置与验收命令，你照抄即可。
+**我接着做**：把 `launch/deploy-values.md` 里的 `YOUR_DOMAIN` 换成真实值给你。
 
 **你要做的（续）**：
 
-- 在 Cloudflare DNS 里按表加记录，`@` 和 `www` 都开**橙云代理**
-- **SSL/TLS → Overview → 选 `Full (strict)`**（选 Flexible 会重定向循环 + 明文回源）
-- 开启 **Always Use HTTPS**，把 www 301 到主域
+- 打开回合 3 建好的 **Pages 项目 → Custom domains → Add custom domain** → 填 `你的域名`
+  → Cloudflare **自动创建 CNAME 并签发免费证书**，不用手动加 A/CNAME
+- 再加一个 `www.你的域名` 自定义域名，用 **Redirect Rules** 把 www 301 到主域
+- 两处填同一个值并重新部署：Cloudflare 环境变量 `SITE_URL` = `https://你的域名`，
+  后台 `Site Settings → Canonical Site URL` 也填 `https://你的域名`
 - ⚠️ **关闭 Bot Fight Mode / 取消「Block AI Scrapers」**，并按我给的 WAF 规则放行
   `GPTBot`、`OAI-SearchBot`、`ClaudeBot`、`PerplexityBot`、`Google-Extended`、`CCBot`
 
@@ -227,7 +287,7 @@ TXT 细节见 `launch/deploy-values.md` B 段（含「SPF 只能有一条、必�
 **我接着做**：
 
 - 后台 `Site Settings → Canonical Site URL` 填 `https://你的域名`（一次改完全站 canonical / sitemap / llms.txt / JSON-LD）
-- Render 后台添加自定义域名；Resend 若选 2C 此时验证发件域并切换 `EMAIL_FROM`
+- 核对 Pages 自定义域名与 `SITE_URL` / Canonical 完全一致；Resend 若切 2B 此时验证发件域
 - 给出 GSC / Bing Webmaster 的 sitemap 提交地址与验证 TXT 记录
 - 跑 `launch/acceptance.sh` 全量验收，输出逐项 PASS/FAIL 报告
 - 给 30/60/90 天获客执行表（`SEO-GEO.md`）
@@ -254,9 +314,10 @@ bash launch/acceptance.sh http://127.0.0.1:3211  # 本地自检
 ## 附：技术参考（不用读，卡住时我再翻）
 
 - `launch/deploy-values.md`：**可复制的 DNS / WAF / SSL / 发件域 / 站长验证配置包**，回合 4–6 用
-- `DEPLOY.md` 第 16 节：Cloudflare / Resend / 域名 / 英语区完整命令与故障速查
-- `README.md`：后台各面板、环境变量、邮件通知说明
+- `DEPLOY.md` **第 17 节**：当前 Cloudflare Pages 静态部署方案（第 16 节为旧 Render 方案存档）
+- `README.md`：两种运行模式、后台各面板、环境变量、邮件通知说明
 - `SEO-GEO.md`：关键词地图、AI 引用监测、内容计划
-- `render.yaml`：托管部署蓝图；`Dockerfile`：换平台时用
-- `tests/`：152 项端到端 + 14 项邮件 + 5 项持久卷 + 3 项管理员密码环境变量回归（共 174 项）
+- `scripts/build-static.js`：静态预渲染；`functions/api/[[path]].js`：同源边缘 API；
+  `render.yaml` / `Dockerfile`：旧付费容器方案存档，不要导入
+- `tests/`：152 项端到端 + 14 项邮件 + 5 项持久卷 + 3 项管理员密码 + 69 项边缘/静态构建（共 243 项）
 - 已内置的英语区合规：`/privacy` 隐私政策页、Cookie 同意横幅、Consent Mode v2、安全响应头（见 `launch/deploy-values.md` H 段）

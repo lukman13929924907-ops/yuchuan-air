@@ -16,3 +16,6 @@ data/uploads/*
 
 # 本地部署凭据（含明文管理员密码），绝不入库
 launch/local-secrets.txt
+
+# Cloudflare Pages 构建产物：CI 每次由 scripts/build-static.js 重新生成
+dist/

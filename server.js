@@ -398,8 +398,12 @@ async function handlePublicApi(req, res, parts, method, query) {
   }
 
   if (parts[1] === 'site' && method === 'GET') {
+    // Webhook URLs are server-side secrets. The Cloudflare edge build already
+    // strips them from its public snapshot; keep the local server consistent.
+    const publicSettings = Object.assign({}, db.settings);
+    delete publicSettings.inquiryWebhook;
     return sendJson(res, 200, {
-      settings: db.settings,
+      settings: publicSettings,
       categories: publishedOnly(db.categories),
       applications: publishedOnly(db.applications),
       counts: {

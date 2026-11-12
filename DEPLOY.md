@@ -487,7 +487,12 @@ ADMIN_PASSWORD='<后台密码>' TEST_PORT=3211 node tests/e2e.js
 
 ---
 
-## 16. 本项目实际方案：阿里云域名 + Cloudflare + 企业邮箱 + 英语区
+## 16. 旧方案存档：阿里云域名 + Cloudflare 反代 + Render 容器 + 企业邮箱
+
+> ⚠️ **2026-11-12 起，本节的部署步骤（尤其 16.8）不再执行。**
+> Render 导入蓝图要求**绑定信用卡**（付费 Starter 实例 + 持久磁盘），已改为
+> **第 17 节的 Cloudflare Pages 静态方案**：免费、无需信用卡、无需服务器、不休眠。
+> 本节中关于 Cloudflare WAF 放行 AI 爬虫、英语区适配、隐私合规、故障排查的内容仍然有效。
 
 > 与第 13 节的关系：第 13 节是「VPS + Nginx + certbot 自签证书」路径，本节是「Cloudflare 代管 DNS/SSL」路径。**二选一，不要两套同时做**；用 Cloudflare 时证书由 Cloudflare 签发，源站不需要 certbot。
 
@@ -691,4 +696,163 @@ curl -s "$D/robots.txt" | grep -iE "GPTBot|Sitemap"
 - **隐私合规已内置**：`/privacy` 服务端渲染的隐私政策页、Cookie 同意横幅、Google Consent Mode v2（默认 `denied`）、Meta / LinkedIn 标签同意后才注入、页脚可随时撤回同意、联系表单隐私告知。后台 `Site Settings → Privacy & compliance` 可开关，`privacyUpdatedAt` 可改政策日期。
 - **上线前请让法务复核 `/privacy`**：页面里是通用模板（含 HTML 注释提示），保留期、跨境传输、监管机构等表述需按实际业务与目标市场确认。
 - **安全头**：`X-Content-Type-Options` / `Referrer-Policy` / `X-Frame-Options` / `Permissions-Policy`，HTTPS 下额外 `Strict-Transport-Security`。未启用 CSP（站点用内联 JSON-LD 与初始化脚本，需 nonce 改造；如需上，先用 Report-Only 观察）。
+
+---
+
+## 17. 当前上线方案：Cloudflare Pages 静态站 + 同源 Pages Function（免信用卡）
+
+> **2026-11-12 定案，这是唯一有效的正式上线路径。** 用户明确不接受绑定信用卡，
+> 而 Render 蓝图的 `plan: starter` + `disk` 必然触发支付方式校验。
+> 逐回合的操作清单见 [LAUNCH-STEPS.md](./LAUNCH-STEPS.md)，精确取值见
+> [launch/deploy-values.md](./launch/deploy-values.md)。
+
+### 17.1 为什么不能用 Render 免费层
+
+Render 官方文档确认免费 Web Service 不需要信用卡，但有两条对本项目是硬伤：
+
+1. **文件系统是 ephemeral**：重启、重新部署、休眠后本地写入全部丢失 —— 后台上传的产品、
+   文章、询盘保不住。
+2. **休眠时 `/robots.txt` 自动返回 `Disallow: /`**（官方原文）。本项目的核心是 SEO / GEO
+   获客，AI 爬虫与 Googlebot 很可能抓到「全站禁止收录」。
+
+因此改成"把状态从服务器本地磁盘挪走"：页面预渲染成静态文件，内容存 GitHub，询盘存 KV。
+
+### 17.2 架构
+
+| 层 | 实现 | 费用 / 限制 |
+| --- | --- | --- |
+| 静态页面 | `dist/` 预渲染 HTML（38 页 / 75 个文件），Cloudflare 全球 CDN | 免费，请求无限 |
+| 同源 API | `functions/api/[[path]].js`，`_routes.json` 限定只拦 `/api/*` | 免费 10 万次/天 |
+| 内容源 | GitHub 仓库 `data/db.json`（唯一数据源，自带版本历史与回滚） | 免费 |
+| 询盘 | Cloudflare KV namespace `INQUIRIES`（买家 PII 不进仓库） | 免费额度足够 |
+| 图片 | GitHub `data/uploads/`，构建时复制进 `dist/uploads/` | 单图 ≤ 900 KB |
+| 邮件 | Resend HTTP API（方式 2A，发到注册邮箱） | 免费额度足够 |
+| HTTPS / 自定义域名 | Cloudflare Universal SSL | 免费 |
+
+**没有服务器、容器、持久卷、休眠、冷启动**；`robots.txt` 恒定正确。
+`info@hanxvonfluid.cn` 仍是前端展示邮箱，通知收件人由服务端 `EMAIL_TO` 决定。
+
+### 17.3 构建
+
+```bash
+node scripts/build-static.js      # 或 npm run build
+```
+
+产物 `dist/` 含：全部页面 HTML（每个 clean URL 同时生成 `foo.html` 与 `foo/index.html`）、
+`robots.txt` / `sitemap.xml` / `llms.txt` / `llms-full.txt`、`css/` `js/` `img/` `admin/` `uploads/`、
+`_headers`（HSTS / nosniff / Permissions-Policy / 缓存）、`_redirects`、
+以及**关键的 `_routes.json`**：
+
+```json
+{ "version": 1, "include": ["/api/*"], "exclude": [] }
+```
+
+不加这个文件，Cloudflare Pages 会让**每个静态页面请求都调用 Function**，白白消耗免费额度。
+
+构建把同一份脱敏内容（剔除 `inquiryWebhook` 与所有询盘 PII）写成**两份**：
+
+| 产物 | 用途 |
+| --- | --- |
+| `dist/_data/site.json` | 静态资源。边缘函数运行时用 `env.ASSETS.fetch()` 读取，**始终与本次构建的 HTML 同源同版本** |
+| `functions/api/_snapshot.js` | 编译进 Function 的兜底快照，仅在没有 `ASSETS` 绑定时生效 |
+
+这样设计的原因：Cloudflare 未明确承诺「先跑 build command 还是先编译 `functions/`」，
+若顺序颠倒，仅靠编译期快照会出现「HTML 是新的、`/api/site` 是旧的」，
+而前台 JS 会用旧设置覆盖页面上的新公司信息。运行时读静态资源彻底消除了这个顺序依赖，
+公开 `/api/*` 仍然**零 GitHub 调用、零外部网络请求**。
+
+`SITE_URL` 环境变量决定 canonical / JSON-LD / OG / sitemap / robots / llms.txt 的绝对地址，
+优先于 `settings.siteUrl`，默认 `https://yuchuan-air.pages.dev`。
+
+### 17.4 Cloudflare Pages 项目设置
+
+| 字段 | 值 |
+| --- | --- |
+| Build command | `node scripts/build-static.js` |
+| Build output directory | `dist` |
+| Root directory | `/` |
+| Production branch | `master` |
+| Framework preset | `None` |
+| Node version | `22`（仓库内 `.node-version` 已固定） |
+
+环境变量（精确值在 `launch/local-secrets.txt`，均不入库）：
+
+| 变量 | 作用 |
+| --- | --- |
+| `ADMIN_PASSWORD` | 后台 `/admin` 登录密码 |
+| `SESSION_SECRET` | HMAC 签名 HttpOnly 会话 cookie |
+| `GITHUB_TOKEN` | fine-grained PAT，**Contents: Read and Write**，仅限本仓库 |
+| `GITHUB_REPO` / `GITHUB_BRANCH` | 仓库与分支 |
+| `EMAIL_API_KEY` / `EMAIL_FROM` / `EMAIL_TO` | Resend 发信（2A） |
+| `SITE_URL` | canonical 基准地址 |
+| `NODE_VERSION` | `22` |
+| `INQUIRY_WEBHOOK` | 可选，额外推送渠道（不要写进后台设置） |
+
+KV 绑定：变量名**必须**是 `INQUIRIES`（Pages 项目 → Settings → Functions →
+KV namespace bindings）。绑定后需重新部署一次才生效。
+
+### 17.5 数据流
+
+- **公开只读**（`/api/site`、`/api/products`、`/api/posts` …）→ 构建产出的 `dist/_data/site.json`
+  （经 `env.ASSETS` 内部读取），与刚发布的 HTML 同一版本，零 GitHub 调用。
+- **后台读**（`/api/admin/data`）→ 从 GitHub 读最新 `data/db.json`，所以保存后刷新后台立刻看到新内容。
+- **后台写** → GET 当前 blob sha → PUT 新内容 → 产生一个 commit →
+  Cloudflare Pages 的 Git 集成**自动重建发布**，约 1 分钟后公开页面更新。
+- **询盘** → honeypot 校验 → 写 KV → Resend 发信（含 UTM / gclid / fbclid / 落地页归因、
+  `Reply-To` = 买家邮箱）→ 返回 201。邮件失败不影响落库。
+- 询盘**不会**触发重建；只有内容编辑与图片上传会。
+
+### 17.6 验收
+
+```bash
+npm run check && npm test                       # 语法 + 22 项单测 + 69 项边缘/静态构建集成测试
+ADMIN_PASSWORD='...' TEST_PORT=3211 node tests/e2e.js   # 本地 Node 模式 152 项
+bash launch/acceptance.sh https://你的域名      # 线上全量验收
+```
+
+线上额外确认：`/_routes.json` 只含 `/api/*`、AI 爬虫 UA 全部 200、
+`/api/site` 同源可读、未登录 `/api/admin/data` 返回 401、后台登录与保存正常、
+提交一条测试询盘后 Gmail 收到带归因的邮件，随后在后台删掉测试记录。
+
+### 17.7 故障速查
+
+| 现象 | 原因 / 处理 |
+| --- | --- |
+| 页面 404 或 CSS 丢失 | Build output directory 不是 `dist`；或 build command 写成 `npm run build` 但 CI 未跑（本项目两种写法都可） |
+| `/api/*` 返回 404 | `_routes.json` 的 include 写错，或 `functions/` 没被 CI 编译 |
+| 后台保存报 `Could not save to GitHub` | `GITHUB_TOKEN` 过期 / 权限不足 / 仓库或分支写错；检查 502 响应体提示 |
+| 后台上传报 413 | 图片超过 900 KB，压成 JPG/WEBP 再传 |
+| 询盘邮件没收到 | `EMAIL_API_KEY` / `EMAIL_FROM` / `EMAIL_TO` 缺项；2A 下 `EMAIL_TO` 必须是 Resend 注册邮箱 |
+| 后台 Inquiries 列表为空 | KV namespace 没绑定到 `INQUIRIES`，或绑定后没重新部署 |
+| 改了内容但前台没变 | 正常，等约 1 分钟自动重建；或到 Pages → Deployments 查看构建日志 |
+| 前台 HTML 是新的、`/api/site` 仍是旧的 | 检查 `dist/_data/site.json` 是否随构建生成；`env.ASSETS` 是 Pages 默认绑定，无需手动配置，缺失时函数会退回编译期快照 |
+| 改密码后仍能用旧密码 | 改的是 Cloudflare 环境变量但没重新部署 |
+
+### 17.8 回滚
+
+GitHub 仓库就是数据库，每次后台保存都是一个独立 commit：
+到 **GitHub → Commits** 找到上一个正确的 `CMS: ...` 提交 → Revert →
+Cloudflare Pages 自动重建，全站内容即回到该版本。不需要数据库备份脚本。
+
+### 17.9 绑定自定义域名（域名买好后）
+
+1. Cloudflare → Add a site → Free 计划 → 到阿里云改 NS。
+2. **Pages 项目 → Custom domains → Add custom domain** → 填域名；
+   Cloudflare 自动创建 CNAME 并签发免费证书，**不需要** `Full (strict)` 设置、
+   不需要回源服务器、不需要手动加 A 记录。
+3. 再加 `www` 域名，用 Redirect Rules 把 www 301 到主域。
+4. Cloudflare 的 `SITE_URL` 与后台 `Canonical Site URL` 同时改成 `https://你的域名` 并重新部署。
+5. 按第 16.3 节关闭 Bot Fight Mode / 放行 AI 爬虫，逐条验证 UA 返回 200。
+
+### 17.10 安全注意
+
+- 当前 GitHub 仓库经检测为 **Public**，建议改为 Private（不影响 Pages 部署，
+  只要 GitHub App 授权时勾上该仓库）。`config.json` 含本地模式的密码哈希。
+- `GITHUB_TOKEN` 用 fine-grained PAT，只授权**这一个仓库**的 Contents 读写；
+  到期后替换变量即可，不改代码。
+- `dist/_data/site.json`、`_snapshot.js` 与 `/api/site` 都不含 `inquiryWebhook` 和询盘 PII；
+  `/_data/*` 已在 `_headers` 中设为 `no-store`；EMAIL / SESSION / GITHUB 密钥只在服务端环境变量里。
+- Resend Key 曾在对话中出现过（仅发信权限），上线稳定后建议轮换。
+- 后台图片单文件 ≤ 900 KB 是 GitHub Contents API 限制；
+  若将来需要更大图片，可改用 Git Data API 的 blob 提交路径。
 

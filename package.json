@@ -1,15 +1,18 @@
 {
   "name": "yuchuan-air-website",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "private": true,
   "type": "commonjs",
-  "description": "Responsive export website with built-in CMS for Shandong Yuchuan Environmental Protection and Energy Saving Technology Co., Ltd. Zero third-party dependencies.",
+  "description": "Responsive export website with a Git-backed CMS for Shandong Yuchuan Environmental Protection and Energy Saving Technology Co., Ltd. Zero third-party dependencies.",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
     "dev": "node server.js",
-    "check": "node --check server.js && node --check lib/store.js && node --check lib/mailer.js && node --check lib/render.js && node --check lib/seo.js && node --check public/js/main.js && node --check admin/js/admin.js && node --check tests/admin-env.test.js",
-    "test:unit": "node tests/mailer.test.js && node tests/store.test.js && node tests/admin-env.test.js"
+    "build": "node scripts/build-static.js",
+    "check": "node --check server.js && node --check lib/store.js && node --check lib/mailer.js && node --check lib/render.js && node --check lib/seo.js && node --check public/js/main.js && node --check admin/js/admin.js && node --check scripts/build-static.js && node --check tests/admin-env.test.js && node --check tests/edge.test.js",
+    "test:unit": "node tests/mailer.test.js && node tests/store.test.js && node tests/admin-env.test.js",
+    "test:edge": "node tests/edge.test.js",
+    "test": "npm run test:unit && npm run test:edge"
   },
   "engines": {
     "node": ">=18"
